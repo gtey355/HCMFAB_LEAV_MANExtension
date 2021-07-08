@@ -7,3 +7,4 @@ deploy.sh
 *.sh
 .vscode/launch.json
 .vscode/settings.json
+.*project.json

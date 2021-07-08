@@ -105,5 +105,9 @@
     "targetFolder": "dist",
     "sourceFolder": "webapp",
     "buildRequired": true
+  },
+  "deploy": {
+    "destination": "HRD",
+    "name": "zmyleaverequest"
   }
 }
