@@ -1,0 +1,42 @@
+{
+	"_version": "1.1.0",
+	"sap.app": {
+		"_version": "1.1.0",
+		"id": "hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension",
+		"type": "application",
+		"applicationVersion": {
+			"version": "1.0"
+		},
+		"title": "{{appTitle}}"
+	},
+	"sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://general-leave-request",
+			"favIcon": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_hcb,sap_belize"
+		]
+	},
+	"sap.ui5": {
+		"_version": "1.1.0",
+		"dependencies": {
+			"minUI5Version": "1.44.47"
+		},
+		"extends": {
+			"component": "hcm.fab.myleaverequest",
+			"extensions": {}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		}
+	}
+}
