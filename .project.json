@@ -8,6 +8,11 @@
       "templateId": "fioriexttemplate.extensionProject",
       "templateVersion": "1.4.0",
       "dateTimeStamp": "Wed, 07 Jul 2021 07:20:26 GMT"
+    },
+    {
+      "templateId": "fioriexttemplate.replaceviewcomponent",
+      "templateVersion": "1.4.0",
+      "dateTimeStamp": "Thu, 08 Jul 2021 09:35:13 GMT"
     }
   ],
   "translation": {

@@ -32,7 +32,14 @@
 		},
 		"extends": {
 			"component": "hcm.fab.myleaverequest",
-			"extensions": {}
+			"extensions": {
+				"sap.ui.viewReplacements": {
+					"hcm.fab.myleaverequest.view.Overview": {
+						"viewName": "hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.view.OverviewCustom",
+						"type": "XML"
+					}
+				}
+			}
 		},
 		"contentDensities": {
 			"compact": true,
