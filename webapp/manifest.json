@@ -38,6 +38,14 @@
 						"viewName": "hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.view.OverviewCustom",
 						"type": "XML"
 					}
+				},
+				"sap.ui.controllerExtensions": {
+					"hcm.fab.myleaverequest.controller.Creation": {
+						"controllerName": "hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.CreationCustom"
+					},
+					"hcm.fab.myleaverequest.controller.Overview": {
+						"controllerName": "hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.OverviewCustom"
+					}
 				}
 			}
 		},
