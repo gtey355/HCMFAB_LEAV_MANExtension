@@ -113,6 +113,6 @@
   },
   "deploy": {
     "destination": "HRD",
-    "name": "zmyleaverequest"
+    "name": "ZMYLEAVEREQUEST"
   }
 }

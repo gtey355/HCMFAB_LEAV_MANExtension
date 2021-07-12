@@ -8,8 +8,12 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 		onInit: function() {
 			
 			var i18nModel = new sap.ui.model.resource.ResourceModel({bundleName: "hcm.fab.myleaverequest.i18n.i18n"});
+			var sRootPath = jQuery.sap.getModulePath("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension");
            
-            i18nModel.enhance({ bundleUrl: "./i18n/i18n_custom.properties" });
+            i18nModel.enhance({ 
+            	//bundleUrl: "i18n/i18n_custom.properties" 
+            	bundleUrl: [sRootPath, "i18n/i18n_custom.properties"].join("/")
+            });
             this.getView().setModel(i18nModel, "i18n");
 		}
 
