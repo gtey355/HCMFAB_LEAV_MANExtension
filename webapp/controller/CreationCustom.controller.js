@@ -143,6 +143,7 @@ sap.ui.define([
 		//            this._bApproverOnBehalfPropertyExists = this._checkForSearchApproverPropertyExistence();
 		//        }.bind(this));
 		//    },
+	
 		//    initLocalModel: function () {
 		//        this.setModelProperties(this.oCreateModel, {
 		//            "uploadPercentage": 0,
@@ -216,32 +217,31 @@ sap.ui.define([
 		//        this._cleanupUnsubmittedViewChanges();
 		//    },
 		onSendRequest: function() {
-		
+			
 
 			var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
+			var sRootPath = jQuery.sap.getModulePath("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension");
 			var i18nModel = new sap.ui.model.resource.ResourceModel({
-				bundleUrl: "./i18n/i18n_custom.properties"
+				bundleUrl: [sRootPath, "i18n/i18n_custom.properties"].join("/")
 			});
 			var sMsgText = i18nModel.getResourceBundle().getText("msgPEP");
-			
-			new Promise(function(resolve,reject){
+
+			new Promise(function(resolve, reject) {
 				sap.m.MessageBox.confirm(
-				sMsgText, {
-					actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-					styleClass: bCompact ? "sapUiSizeCompact" : "",
-					onClose: function(sAction) {
-						if (sAction === 'OK') {
-							resolve(true);
+					sMsgText, {
+						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+						styleClass: bCompact ? "sapUiSizeCompact" : "",
+						onClose: function(sAction) {
+							if (sAction === 'OK') {
+								resolve(true);
+							}
 						}
 					}
-				}
-			);
-			}).then(function(){
-				
+				);
+			}).then(function() {
+
 				this._sendRequest();
 			}.bind(this));
-
-		
 
 		},
 

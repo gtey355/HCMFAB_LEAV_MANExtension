@@ -1,51 +1,49 @@
 <c:FragmentDefinition xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:c="sap.ui.core" xmlns:t="sap.ui.table">
-			<Panel id="limitPanel" expandable="true" expanded="{overview>/entitlementsExpanded}" headerText="{i18n>limitTabTitle}"
-					width="auto">
-					<Table id="limitTable" items="{}" updateFinished="onUpdateFinishedEntitlements" growing="true" growingThreshold="5" inset="false"
-						growingScrollToLoad="false" busyIndicatorDelay="0">
-						<headerToolbar>
-							<OverflowToolbar>
-								<Title id="limitCount" text="{path: 'overview>/entCount', formatter: '.formatter.itemCountFormatter'}" titleStyle="Auto" level="Auto"
-									visible="{= !${device>/system/phone}}"/>
-								<ToolbarSpacer/>
-							
-								<Label text="{i18n>showFrom}" visible="{= !${device>/system/phone}}"/>
-								<DatePicker id="limitDatePicker"
-									value="{ path: 'overview>/limitStartDate', type:'sap.ui.model.type.Date', formatOptions: { style: 'medium', strictParsing: true , UTC: true } }"
-									change="onLimitDateChanged" width="10rem" tooltip="{i18n>showLimitFrom}" ariaLabelledBy="limitDatePickerAccLabel"/>
-	
-							</OverflowToolbar>
-						</headerToolbar>
-						<columns>
-							<!-- Leave Type -->
-							<Column id="leaveLimitTypeCol">
-								<Text text="{i18n>leaveTypTxt}"/>
-							</Column>
-						
-							<!-- Available  -->
-							<Column id="availableLimitCol" hAlign="{= ${device>/system/phone} ? 'End' : 'Center'}">
-								<Text text="{i18n>availableText}"/>
-							</Column>
-							<!-- Planned  -->
-							<Column id="plannedLimitCol" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
-								<Text text="{i18n>plannedText}"/>
-							</Column>
-						</columns>
-						<items>
-							<ColumnListItem type="{= ${device>/system/phone} ? 'Navigation' : 'Inactive' }" id="limitColumnListItem">
-								<cells>
-									<!-- Leave Type -->
-									<ObjectIdentifier title="{TimeAccountTypeName}" class="sapMTableContentMargin"/>
-									
-									<!-- Available  -->
-									<ObjectNumber class="sapMTableContentMargin" emphasized="true"
-										number="{path:'BalanceAvailableQuantity', type: 'sap.ui.model.odata.type.Double', formatOptions: { maxFractionDigits: 2, minFractionDigits: 0 }}"
-										state="Success"
-										unit="{parts:[{path: 'BalanceAvailableQuantity'}, {path: 'TimeUnitCode'}, {path: 'TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
-								
-								</cells>
-							</ColumnListItem>
-						</items>
-					</Table>
-				</Panel>
+	<Panel id="limitPanel" expandable="true" expanded="{overview>/entitlementsExpanded}" headerText="{i18n>limitTabTitle}" width="auto">
+		<!--updateFinished must be replaced -->
+		<Table id="limitTable" items="{}" updateFinished="onUpdateFinishedLimits" growing="true" growingThreshold="5" inset="false"
+			growingScrollToLoad="false" busyIndicatorDelay="0">
+			<headerToolbar>
+				<OverflowToolbar>
+					<Title id="limitCount" text="{path: 'overview>/entCount', formatter: '.formatter.itemCountFormatter'}" titleStyle="Auto" level="Auto"
+						visible="{= !${device>/system/phone}}"/>
+					<ToolbarSpacer/>
+					<Label text="{i18n>showOn}" visible="{= !${device>/system/phone}}"/>
+					<DatePicker id="limitDatePicker"
+						value="{ path: 'overview>/limitStartDate', type:'sap.ui.model.type.Date', formatOptions: { style: 'medium', strictParsing: true , UTC: true } }"
+						change="onLimitDateChanged" width="10rem" tooltip="{i18n>showLimitFrom}" ariaLabelledBy="limitDatePickerAccLabel"/>
+				</OverflowToolbar>
+			</headerToolbar>
+			<columns>
+				<!-- Leave Type -->
+				<Column id="leaveLimitTypeCol">
+					<Text text="{i18n>leaveTypTxt}"/>
+				</Column>
+				<!-- Available  -->
+				<Column id="availableLimitCol" hAlign="{= ${device>/system/phone} ? 'End' : 'Center'}">
+					<Text text="{i18n>availableText}"/>
+				</Column>
+				<!-- Planned  -->
+				<Column id="plannedLimitCol" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
+					<Text text="{i18n>plannedText}"/>
+				</Column>
+			</columns>
+			<items>
+				<ColumnListItem type="{= ${device>/system/phone} ? 'Navigation' : 'Inactive' }" id="limitColumnListItem">
+					<cells>
+						<!-- Leave Type -->
+						<ObjectIdentifier title="{TimeAccountTypeName}" class="sapMTableContentMargin"/>
+						<!-- Available  -->
+						<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'AvailableQuantity', type: 'sap.ui.model.odata.type.Byte'}"
+							state="Success"
+							unit="{parts:[{path: 'AvailableQuantity'}, {path: 'TimeUnitCode'}, {path: 'TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
+						<!-- Planned  -->
+						<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'PlannedAmount', type: 'sap.ui.model.odata.type.Byte'}"
+							state="None"
+							unit="{parts:[{path: 'PlannedAmount'}, {path: 'TimeUnitCode'}, {path: 'TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
+					</cells>
+				</ColumnListItem>
+			</items>
+		</Table>
+	</Panel>
 </c:FragmentDefinition>

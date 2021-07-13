@@ -7,7 +7,20 @@
 		"applicationVersion": {
 			"version": "1.0"
 		},
-		"title": "{{appTitle}}"
+		"title": "{{appTitle}}",
+		"i18n": "i18n/i18n_custom.properties",
+		"dataSources": {
+			"leaveService": {
+				"uri": "/sap/opu/odata/sap/ZHCMFAB_LEAVE_REQUEST_CR_SRV/",
+				"settings": {
+					"localUri": "./localService/metadata.xml"
+				}
+			}
+		},
+		"sourceTemplate": {
+			"id": "fioriexttemplate.replaceservicecomponent",
+			"version": "1.4.0"
+		}
 	},
 	"sap.ui": {
 		"_version": "1.1.0",

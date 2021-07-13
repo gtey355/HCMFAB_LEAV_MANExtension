@@ -3,7 +3,6 @@
   "routes": [
     {
       "path": "/sap/opu/odata",
-      "wattUsage": "odata_abap",
       "target": {
         "type": "destination",
         "name": "HRD",

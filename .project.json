@@ -18,6 +18,11 @@
       "templateId": "fioriexttemplate.extendcontrollercomponent",
       "templateVersion": "1.4.0",
       "dateTimeStamp": "Fri, 09 Jul 2021 06:28:59 GMT"
+    },
+    {
+      "templateId": "fioriexttemplate.replaceservicecomponent",
+      "templateVersion": "1.4.0",
+      "dateTimeStamp": "Mon, 12 Jul 2021 12:52:31 GMT"
     }
   ],
   "translation": {
@@ -28,7 +33,7 @@
     "resourceModelName": "i18n"
   },
   "mockpreview": {
-    "mockUri": "/sap/opu/odata/sap/HCMFAB_LEAVE_REQUEST_CR_SRV",
+    "mockUri": "/sap/opu/odata/sap/ZHCMFAB_LEAVE_REQUEST_CR_SRV",
     "metadataFilePath": "",
     "loadJSONFiles": false,
     "loadCustomRequests": false,
@@ -113,6 +118,6 @@
   },
   "deploy": {
     "destination": "HRD",
-    "name": "zmyleaverequest"
+    "name": "ZMYLEAVEREQUEST"
   }
 }
