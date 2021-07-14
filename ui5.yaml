@@ -12,7 +12,7 @@ server:
       backend:
       - path: /sap
         url: https://vhmgthrdci.hec.corp.tander.ru:44300
-        client: '302'
+        client: '100'
       ui5:
         path: 
         - /resources
