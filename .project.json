@@ -118,6 +118,6 @@
   },
   "deploy": {
     "destination": "HRD",
-    "name": "ZMYLEAVEREQUEST"
+    "name": "ZHR_ESS_LEAVREQ"
   }
 }
