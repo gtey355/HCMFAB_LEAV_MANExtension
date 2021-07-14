@@ -34,22 +34,33 @@ sap.ui.define([
 	"sap/m/StandardListItem",
 	"sap/m/DateRangeSelection",
 	"sap/m/DatePicker"
-], function(f, u, B, D, C, a, H, F, b, c, d, E, L, I, T, M, e, g, h, j, P, O, k, U, l, m, J, n, N, o, q, r, S, s, t) {
+], function(formatter, utils, BaseController, DataUtil, CalendarUtil, Device, History, Filter, FilterOperator, Context, Decimal, Event,
+	Label, Input, Title,
+	MessagePopover,
+	MessagePopoverItem,
+	MessageToast,
+	MessageBox, ToolbarSpacer, ProgressIndicator, OverflowToolbar, ObjectAttribute,
+	UploadCollection, UploadCollectionItem, UploadCollectionParameter, JSONModel,
+	DateFormat, NumberFormat, TeamCalendarControl, Dialog, Button, StandardListItem, DateRangeSelection, DatePicker) {
 	"use strict";
-	var v = 5;
-	var w = 5;
-	var x = [
+
+	var I_MAX_APPROVERS = 5;
+	var I_MAX_ATTACHMENTS = 5;
+
+	/* These fields from the LOCAL model should also cause data loss warnings */
+	var LOCAL_MODEL_CHANGE_RELEVANT_PROPERTY_LIST = [
 		"notes",
 		"AdditionalFields"
 	];
-	var y = {
+
+	var O_SEARCH_HELPER_MAPPINGS = {
 		"CompCode": {
 			keyField: "CompanyCodeID",
 			titleField: "CompanyCodeID",
 			descriptionField: "CompanyCodeText",
 			searchFields: "CompanyCodeID,CompanyCodeText"
 		},
-		"DescIllness": {
+		"DescIllness": { // Desc. Illness
 			keyField: "IllnessCode",
 			titleField: "IllnessCode",
 			descriptionField: "IllnessDescTxt",
@@ -61,13 +72,13 @@ sap.ui.define([
 			descriptionField: "CostCenterText",
 			searchFields: "CostCenterID,CostCenterText"
 		},
-		"OtCompType": {
+		"OtCompType": { // OT comp. type
 			keyField: "OverTimeCompID",
 			titleField: "OverTimeCompID",
 			descriptionField: "OverTimeCompText",
 			searchFields: "OverTimeCompID,OverTimeCompText"
 		},
-		"TaxArea": {
+		"TaxArea": { // Tax Area
 			keyField: "WorkTaxAreaID",
 			titleField: "WorkTaxAreaID",
 			descriptionField: "WorkTaxAreaDesciption",
@@ -79,19 +90,20 @@ sap.ui.define([
 			descriptionField: "ObjTypetext",
 			searchFields: "ObjtypeID,ObjTypetext"
 		},
-		"WageType": {
+		"WageType": { // Wage Type
 			keyField: "WageTypeID",
 			titleField: "WageTypeID",
 			descriptionField: "WageTypeText",
 			searchFields: "WageTypeID,WageTypeText"
 		},
-		"OrderID": {
+		"OrderID": { // Order
 			keyField: "OrderNumID",
 			titleField: "OrderNumID",
 			descriptionField: "OrderNumText",
 			searchFields: "OrderNumID,OrderNumText"
 		}
 	};
+
 	return sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.CreationCustom", {
 		//    oCreateModel: null,
 		//    sCEEmployeeId: undefined,
@@ -143,7 +155,7 @@ sap.ui.define([
 		//            this._bApproverOnBehalfPropertyExists = this._checkForSearchApproverPropertyExistence();
 		//        }.bind(this));
 		//    },
-	
+
 		//    initLocalModel: function () {
 		//        this.setModelProperties(this.oCreateModel, {
 		//            "uploadPercentage": 0,
@@ -217,7 +229,6 @@ sap.ui.define([
 		//        this._cleanupUnsubmittedViewChanges();
 		//    },
 		onSendRequest: function() {
-			
 
 			var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
 			var sRootPath = jQuery.sap.getModulePath("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension");
@@ -246,111 +257,172 @@ sap.ui.define([
 		},
 
 		_sendRequest: function() {
-				var p = {},
-					z = this.getView().getBindingContext().getPath();
+				var oOriginalProperties = {},
+					sPath = this.getView().getBindingContext().getPath();
+
 				this.oErrorHandler.setShowErrors("manual");
-				this._copyAdditionalFieldsIntoModel(this.oCreateModel.getProperty("/AdditionalFields"), this.oODataModel, z);
+
+				/* 
+				ADDITIONAL FIELDS 
+				*/
+				this._copyAdditionalFieldsIntoModel(
+					this.oCreateModel.getProperty("/AdditionalFields"),
+					this.oODataModel,
+					sPath
+				);
+
+				//check required fields
 				if (!this._requiredAdditionalFieldsAreFilled()) {
 					this.byId("createMessagesIndicator").focus();
 					return;
 				}
+
+				//check for fields with errors
 				if (this._checkFormFieldsForError()) {
 					this.byId("createMessagesIndicator").focus();
 					return;
 				}
-				var A = function(i, V) {
-					var R = this.oODataModel.getProperty(i);
-					if (V === R) {
+
+				/* 
+				NOTES
+				*/
+				// Add note text if not empty
+				var fSetNoteProperty = function(sPropertyPath, oValue) {
+					var oOldValue = this.oODataModel.getProperty(sPropertyPath);
+					if (oValue === oOldValue) {
 						return;
 					}
-					if (V && V.equals && V.equals(R)) {
+					if (oValue && oValue.equals && oValue.equals(oOldValue)) {
 						return;
 					}
-					p[i] = R;
-					this.oODataModel.setProperty(i, V);
+					oOriginalProperties[sPropertyPath] = oOldValue;
+					this.oODataModel.setProperty(sPropertyPath, oValue);
 				}.bind(this);
+
 				if (this.oCreateModel.getProperty("/notes")) {
-					A(z + "/Notes", this.oCreateModel.getProperty("/notes"));
+					fSetNoteProperty(sPath + "/Notes", this.oCreateModel.getProperty("/notes"));
 				} else {
-					A(z + "/Notes", this._notesBuffer);
+					//If note text did not change keep the existing text (which means no update)
+					fSetNoteProperty(sPath + "/Notes", this._notesBuffer);
 				}
-				var G = [];
+
+				/* 
+				ATTACHMENTS
+				*/
+				var aUploadColletionItems = [];
 				if (this.oUploadCollection) {
-					G = this.oUploadCollection.getItems();
-					if (G.length > w) {
+					aUploadColletionItems = this.oUploadCollection.getItems();
+					if (aUploadColletionItems.length > I_MAX_ATTACHMENTS) {
 						this.oErrorHandler.pushError(this.getResourceBundle().getText("txtMaxAttachmentsReached"));
 						this.oErrorHandler.displayErrorPopup();
 						this.oErrorHandler.setShowErrors("immediately");
 						return;
 					}
 				} else if (this.oUploadSet) {
-					G = this.oUploadSet.getItems().concat(this.oUploadSet.getIncompleteItems());
+					aUploadColletionItems = this.oUploadSet.getItems().concat(this.oUploadSet.getIncompleteItems());
 				}
-				if (this.oCreateModel.getProperty("/isAttachmentMandatory") && G.length === 0) {
+
+				// Check if manadatory attachments exist
+				if (this.oCreateModel.getProperty("/isAttachmentMandatory") && aUploadColletionItems.length === 0) {
 					this.oErrorHandler.pushError(this.getResourceBundle().getText("txtAttachmentsRequired"));
 					this.oErrorHandler.displayErrorPopup();
 					this.oErrorHandler.setShowErrors("immediately");
 					return;
 				}
-				this._updateLeaveRequestWithModifiedAttachments(this.oODataModel, z);
-				if (this.oCreateModel.getProperty("/multiOrSingleDayRadioGroupIndex") === null || this.oCreateModel.getProperty(
-						"/multiOrSingleDayRadioGroupIndex") === 0) {
-					this.oODataModel.setProperty(z + "/PlannedWorkingHours", "0.0");
-					this.oODataModel.setProperty(z + "/StartTime", "");
-					this.oODataModel.setProperty(z + "/EndTime", "");
+
+				// do necessary model updates for add and delete
+				this._updateLeaveRequestWithModifiedAttachments(this.oODataModel, sPath);
+
+				//In case of create mode: set the time based values to initial (if probably touched in between
+				if ((this.oCreateModel.getProperty("/multiOrSingleDayRadioGroupIndex") === null) ||
+					(this.oCreateModel.getProperty("/multiOrSingleDayRadioGroupIndex") === 0)) {
+					this.oODataModel.setProperty(sPath + "/PlannedWorkingHours", "0.0");
+					this.oODataModel.setProperty(sPath + "/StartTime", "");
+					this.oODataModel.setProperty(sPath + "/EndTime", "");
 				}
+
+				//Note 2819539: Forward the information about a potential EditPostedLeave-Scenario - ActionID is 3 in this case
 				if (this.oCreateModel.getProperty("/sEditMode") === "DELETE") {
-					this.oODataModel.setProperty(z + "/ActionID", 3);
+					this.oODataModel.setProperty(sPath + "/ActionID", 3);
 				}
-				var K = function(R) {
+
+				/* 
+				HANDLE SUBMIT
+				*/
+				var fnError = function(oError) {
 					this.oCreateModel.setProperty("/busy", false);
 					this.oCreateModel.setProperty("/uploadPercentage", 0);
-					Object.keys(p).forEach(function(Y) {
-						var Z = p[Y];
-						this.oODataModel.setProperty(Y, Z);
+
+					// This addresses the current situation:
+					//
+					// 1. user enters some data in some of the fields
+					// 2. submit error
+					// 3. user deletes added fields
+					// 4. submit success
+					//
+					Object.keys(oOriginalProperties).forEach(function(sInnerPath) {
+						var oOriginalValue = oOriginalProperties[sInnerPath];
+
+						this.oODataModel.setProperty(sInnerPath, oOriginalValue);
 					}.bind(this));
-					var V = this.oODataModel.getProperty(z),
-						W = "",
-						X = "";
-					for (var i = 0; i < w; i++) {
-						X = "Attachment" + (i + 1);
-						W = z + "/" + X;
-						if (V[X] && !this.oODataModel.getProperty(W + "/AttachmentStatus")) {
-							this.oODataModel.setProperty(W, {
+
+					//cleanup of attachments recently added
+					var oLeaveRequestToEdit = this.oODataModel.getProperty(sPath),
+						sBasePropertyPath = "",
+						sAttachmentProperty = "";
+
+					for (var i = 0; i < I_MAX_ATTACHMENTS; i++) {
+						sAttachmentProperty = "Attachment" + (i + 1);
+						sBasePropertyPath = sPath + "/" + sAttachmentProperty;
+						if (oLeaveRequestToEdit[sAttachmentProperty] && !this.oODataModel.getProperty(sBasePropertyPath + "/AttachmentStatus")) {
+							this.oODataModel.setProperty(sBasePropertyPath, {
 								FileName: "",
 								FileType: "",
 								FileSize: "0"
 							});
 						}
 					}
-					this.oErrorHandler.pushError(R);
+
+					// show one or more error messages
+					this.oErrorHandler.pushError(oError);
 					this.oErrorHandler.displayErrorPopup();
+
 					this.oErrorHandler.setShowErrors("immediately");
 				};
+
 				if (this.oODataModel.hasPendingChanges()) {
-					var Q = {
-						requestID: this.oODataModel.getProperty(z + "/RequestID"),
-						aUploadedFiles: [],
-						leavePath: z,
+					var oParams = {
+						requestID: this.oODataModel.getProperty(sPath + "/RequestID"),
+						aUploadedFiles: [], // information about each uploaded file,
+						leavePath: sPath,
 						showSuccess: true
 					};
-					this.oODataModel.setProperty(z + "/IsMultiLevelApproval", this.oCreateModel.getProperty("/IsMultiLevelApproval"));
+
+					//Forward the information whether we are running in a multiple approver scenario from AbsensceType to the LeaveRequest in create case
+					this.oODataModel.setProperty(sPath + "/IsMultiLevelApproval", this.oCreateModel.getProperty("/IsMultiLevelApproval"));
 					this.oCreateModel.setProperty("/busy", true);
-					this.submitLeaveRequest(Q).then(this._uploadAttachments.bind(this)).then(this._showSuccessStatusMessage.bind(this)).catch(K.bind(
-						this));
-				} else if (this.oODataModel.getProperty(z + "/StatusID") === "REJECTED") {
+
+					this.submitLeaveRequest(oParams)
+						.then(this._uploadAttachments.bind(this))
+						.then(this._showSuccessStatusMessage.bind(this))
+						.catch(fnError.bind(this));
+
+				} else if (this.oODataModel.getProperty(sPath + "/StatusID") === "REJECTED") {
+					//if request was rejected the enduser should be able to resend the request without changing anything
 					this.oCreateModel.setProperty("/busy", true);
-					this.oODataModel.update(z, this.oODataModel.getObject(z), {
+					this.oODataModel.update(sPath, this.oODataModel.getObject(sPath), {
 						success: function() {
 							this._showSuccessStatusMessage();
 						}.bind(this),
 						error: function() {
-							K.call(this);
+							fnError.call(this);
 						}.bind(this)
 					});
 				} else {
-					g.show(this.getResourceBundle().getText("noChangesFound"));
+					//show message toast that nothing was changed
+					MessageToast.show(this.getResourceBundle().getText("noChangesFound"));
 				}
+
 			}
 			//    onCancel: function () {
 			//        this._confirmCancel();
