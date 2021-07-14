@@ -105,56 +105,98 @@ sap.ui.define([
 	};
 
 	return sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.CreationCustom", {
-		//    oCreateModel: null,
-		//    sCEEmployeeId: undefined,
-		//    formatter: f,
-		//    utils: u,
-		//    oUploadCollection: null,
-		//    oUploadSet: null,
-		//    _messagesPopover: null,
-		//    _notesBuffer: null,
-		//    _oMessagePopover: null,
-		//    _oNewFileData: {},
-		//    _oControlToFocus: null,
-		//    _bCheckboxFieldsAreBoolean: false,
-		//    _bApproverOnBehalfPropertyExists: false,
-		//    _oSearchApproverItemTemplate: null,
-		//    _bCheckLeaveSpanDateIsEdmTime: false,
-		//    onInit: function () {
-		//        var i = this.getOwnerComponent(), R = i.getRouter();
-		//        this._oAdditionalFieldsControls = {};
-		//        this._absenceTypeReceivedDeferred = u.createDeferred();
-		//        R.getRoute("creation").attachPatternMatched(this._onCreateRouteMatched, this);
-		//        R.getRoute("creationWithParams").attachPatternMatched(this._onCreateRouteMatched, this);
-		//        R.getRoute("edit").attachPatternMatched(this._onEditRouteMatched, this);
-		//        R.getRoute("delete").attachPatternMatched(this._onDeletePostedLeaveRouteMatched, this);
-		//        this._oNotesModel = new J({ NoteCollection: [] });
-		//        this.setModel(this._oNotesModel, "noteModel");
-		//        this.oCreateModel = new J();
-		//        this.setModel(this.oCreateModel, "create");
-		//        this.initLocalModel();
-		//        this.oODataModel = i.getModel();
-		//        this.oErrorHandler = i.getErrorHandler();
-		//        this._oAttachmentsContainer = this.byId("attachmentsContainer");
-		//        if (!a.system.phone) {
-		//            this.byId("leaveTypeSelectionForm").addDependent(this.byId("absDescLink"));
-		//        }
-		//        this.oCreateModel.attachPropertyChange(this._revalidateSaveButtonStatus, this);
-		//        this.oODataModel.attachPropertyChange(this._revalidateSaveButtonStatus, this);
-		//        if (t.getMetadata().hasEvent("navigate")) {
-		//            this.getView().byId("startDate").attachNavigate(this.onCalendarNavigate, this);
-		//        }
-		//        if (s.getMetadata().hasEvent("navigate")) {
-		//            this.getView().byId("dateRange").attachNavigate(this.onCalendarNavigate, this);
-		//        }
-		//        this.oODataModel.getMetaModel().loaded().then(function () {
-		//            var A = this._getAdditionalFieldMetaInfo("PrevDay");
-		//            this._bCheckboxFieldsAreBoolean = A.type === "Edm.Boolean";
-		//            var p = this._getLeaveSpanDateFieldMetaInfo("EndDate");
-		//            this._bCheckLeaveSpanDateIsEdmTime = p.type === "Edm.DateTime";
-		//            this._bApproverOnBehalfPropertyExists = this._checkForSearchApproverPropertyExistence();
-		//        }.bind(this));
-		//    },
+		oCreateModel: null,
+		sCEEmployeeId: undefined,
+		formatter: formatter,
+		utils: utils,
+		oUploadCollection: null,
+		oUploadSet: null,
+		_messagesPopover: null,
+		_notesBuffer: null,
+		_oMessagePopover: null,
+		_oNewFileData: {},
+		_oControlToFocus: null,
+		_bCheckboxFieldsAreBoolean: false,
+		_bApproverOnBehalfPropertyExists: false,
+		_oSearchApproverItemTemplate: null,
+		_bCheckLeaveSpanDateIsEdmTime: false,
+
+		/* =========================================================== */
+		/* lifecycle methods                                           */
+		/* =========================================================== */
+
+		/**
+		 * Called when a controller is instantiated and its View controls (if available) are already created.
+		 * Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
+		 * @memberOf hcm.fab.myleaverequest.view.Creation
+		 */
+		onInit: function() {
+			var oOwnerComponent = this.getOwnerComponent(),
+				oRouter = oOwnerComponent.getRouter();
+
+			// Contains "instantiated" fragments
+			this._oAdditionalFieldsControls = {};
+
+			//
+			// Setup a deferred object with a promise resolved when data about
+			// absence type are received.
+			//
+			this._absenceTypeReceivedDeferred = utils.createDeferred();
+
+			oRouter.getRoute("creation").attachPatternMatched(this._onCreateRouteMatched, this);
+			oRouter.getRoute("creationWithParams").attachPatternMatched(this._onCreateRouteMatched, this);
+			oRouter.getRoute("edit").attachPatternMatched(this._onEditRouteMatched, this);
+			oRouter.getRoute("delete").attachPatternMatched(this._onDeletePostedLeaveRouteMatched, this);
+
+			this._oNotesModel = new JSONModel({
+				NoteCollection: []
+			});
+			this.setModel(this._oNotesModel, "noteModel");
+
+			this.oCreateModel = new JSONModel();
+			this.setModel(this.oCreateModel, "create");
+			this.initLocalModel();
+
+			this.oODataModel = oOwnerComponent.getModel();
+			this.oErrorHandler = oOwnerComponent.getErrorHandler();
+			this._oAttachmentsContainer = this.byId("attachmentsContainer");
+
+			if (!Device.system.phone) {
+				this.byId("leaveTypeSelectionForm").addDependent(this.byId("absDescLink"));
+			}
+
+			// register on changes for local and odata model in order to enable/disable the save button
+			this.oCreateModel.attachPropertyChange(this._revalidateSaveButtonStatus, this);
+			this.oODataModel.attachPropertyChange(this._revalidateSaveButtonStatus, this);
+
+			// Init SAPUI5-dependent UI settings
+			if (DatePicker.getMetadata().hasEvent("navigate")) { // Since 1.46
+				this.getView().byId("startDate").attachNavigate(this.onCalendarNavigate, this);
+			}
+			if (DateRangeSelection.getMetadata().hasEvent("navigate")) { // Since 1.46
+				this.getView().byId("dateRange").attachNavigate(this.onCalendarNavigate, this);
+			}
+
+			this.oODataModel.getMetaModel().loaded().then(function() {
+				var oAddFieldMetaInfo = this._getAdditionalFieldMetaInfo("PrevDay"); //pick 1 property that was changed with SAP-note 2732263
+				this._bCheckboxFieldsAreBoolean = oAddFieldMetaInfo.type === "Edm.Boolean";
+				var oLeaveSpanMetaInfo = this._getLeaveSpanDateFieldMetaInfo("EndDate");
+				this._bCheckLeaveSpanDateIsEdmTime = oLeaveSpanMetaInfo.type === "Edm.DateTime";
+				this._bApproverOnBehalfPropertyExists = this._checkForSearchApproverPropertyExistence();
+			}.bind(this));
+
+			// add custom i18n
+			var i18nModel = new sap.ui.model.resource.ResourceModel({
+				bundleName: "hcm.fab.myleaverequest.i18n.i18n"
+			});
+			var sRootPath = jQuery.sap.getModulePath("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension");
+
+			i18nModel.enhance({
+				//bundleUrl: "i18n/i18n_custom.properties" 
+				bundleUrl: [sRootPath, "i18n/i18n_custom.properties"].join("/")
+			});
+			this.getView().setModel(i18nModel, "i18n");
+		},
 
 		//    initLocalModel: function () {
 		//        this.setModelProperties(this.oCreateModel, {

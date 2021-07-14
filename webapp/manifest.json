@@ -50,6 +50,10 @@
 					"hcm.fab.myleaverequest.view.Overview": {
 						"viewName": "hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.view.OverviewCustom",
 						"type": "XML"
+					},
+					"hcm.fab.myleaverequest.view.Creation": {
+						"viewName": "hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.view.CreationCustom",
+						"type": "XML"
 					}
 				},
 				"sap.ui.controllerExtensions": {

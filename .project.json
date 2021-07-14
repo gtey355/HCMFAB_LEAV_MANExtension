@@ -12,7 +12,7 @@
     {
       "templateId": "fioriexttemplate.replaceviewcomponent",
       "templateVersion": "1.4.0",
-      "dateTimeStamp": "Thu, 08 Jul 2021 09:35:13 GMT"
+      "dateTimeStamp": "Wed, 14 Jul 2021 14:52:12 GMT"
     },
     {
       "templateId": "fioriexttemplate.extendcontrollercomponent",
@@ -23,6 +23,11 @@
       "templateId": "fioriexttemplate.replaceservicecomponent",
       "templateVersion": "1.4.0",
       "dateTimeStamp": "Mon, 12 Jul 2021 12:52:31 GMT"
+    },
+    {
+      "templateId": "fioriexttemplate.hidecontrolcomponent",
+      "templateVersion": "1.4.0",
+      "dateTimeStamp": "Wed, 14 Jul 2021 14:45:54 GMT"
     }
   ],
   "translation": {

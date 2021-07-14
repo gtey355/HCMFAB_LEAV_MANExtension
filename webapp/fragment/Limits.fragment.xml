@@ -25,7 +25,7 @@
 				</Column>
 				<!-- Planned  -->
 				<Column id="plannedLimitCol" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
-					<Text text="{i18n>plannedText}"/>
+					<Text text="{i18n>plannedLimitText}"/>
 				</Column>
 			</columns>
 			<items>

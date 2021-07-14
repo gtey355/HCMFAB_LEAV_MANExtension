@@ -7,7 +7,7 @@
 	xmlns:semantic="sap.m.semantic" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:v="sap.ui.comp.variants"
 	xmlns:footerbar="sap.ushell.ui.footerbar" xmlns:u="sap.ui.unified" xmlns:common="hcm.fab.lib.common.controls">
 	<semantic:FullscreenPage navButtonPress="onNavBack" showNavButton="true" id="page" showSubHeader="true" floatingFooter="true"
-		title="{i18n>appDescription}" busy="{= ${global>/isAssignmentLoading} || ${overview>/isDeletingLeaveRequest} }">
+		title="{i18n>appDescriptionExt}" busy="{= ${global>/isAssignmentLoading} || ${overview>/isDeletingLeaveRequest} }">
 		<l:ResponsiveFlowLayout>
 			<VBox renderType="Bare" class="sapUiResponsiveMargin">
 				<layoutData>
@@ -15,7 +15,7 @@
 				</layoutData>
 				<common:OnBehalfIndicator id="overviewOnBehalfIndicator" applicationId="MYLEAVEREQUESTS"/>
 				<Panel id="entitlementPanel" expandable="true" expanded="{overview>/entitlementsExpanded}" headerText="{i18n>entitlementTabTitle}"
-					width="auto" expand="onEntitlementPanelExpand">
+					width="auto" expand="onEntitlementPanelExpand" visible="false">
 					<Table id="entitlementTable" items="{}" updateFinished="onUpdateFinishedEntitlements" growing="true" growingThreshold="5" inset="false"
 						growingScrollToLoad="false" itemPress="onEntitlementItemPressed" busyIndicatorDelay="0"
 						ariaLabelledBy="entitlementTitleInvTxt,entitlementCountInvTxt">
@@ -234,7 +234,7 @@
 			<semantic:MessagesIndicator press="onHandlePopover"/>
 		</semantic:messagesIndicator>
 		<semantic:mainAction>
-			<semantic:MainAction id="btnCreateLeaveRequest" text="{i18n>createBtnTxt}" press="onCreateLeave" tooltip="{i18n>createViewTitle}"/>
+			<semantic:MainAction id="btnCreateLeaveRequest" text="{i18n>createBtnTxtExt}" press="onCreateLeave" tooltip="{i18n>createViewTitle}"/>
 		</semantic:mainAction>
 		<semantic:customFooterContent>
 			<common:ConcurrentEmploymentOverflowToolbarButton id="toolBtnCE" assignmentChange="onAssignmentSwitch"
