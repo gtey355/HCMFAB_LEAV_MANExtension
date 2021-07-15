@@ -21,15 +21,20 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@sap/ux-ui5-tooling": "1",
     "@ui5/cli": "^2.10.4",
     "@ui5/fs": "^2.0.6",
     "@ui5/logger": "^2.0.1",
-    "@sap/ux-ui5-tooling": "1",
-    "rimraf": "3.0.2"
+    "rimraf": "3.0.2",
+    "ui5-task-nwabap-deployer": "^2.0.0"
   },
   "ui5": {
     "dependencies": [
-      "@sap/ux-ui5-tooling"
+      "@sap/ux-ui5-tooling",
+      "ui5-task-nwabap-deployer"
     ]
+  },
+  "dependencies": {
+    "@sap/abap-deploy": "^0.10.23"
   }
 }

@@ -1,3 +1,6 @@
+(function () {
+	jQuery.sap.registerModulePath("hcm.fab.lib.common", "/sap/bc/ui5_ui5/sap/hcmfab_common/");
+}());
 jQuery.sap.declare("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.Component");
 
 // use the load function for getting the optimized preload file if present

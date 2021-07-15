@@ -6,19 +6,26 @@ metadata:
 type: application
 ui5Theme: sap_fiori_3
 builder:
+  ignoreCertError: true
   resources:
     excludes:
       - /test/**
       - /localService/**
   customTasks:
     - name: deploy-to-abap
+      
       afterTask: generateCachebusterInfo
       configuration:
+      
         target:
-          url: http://localhost:50000
-          client: "001"
+          url: https://vhmgthrdci.hec.corp.tander.ru:44300
+          client: "100"
+          auth: basic
+        credentials:
+          username: env:UI5_USERNAME
+          password: env:UI5_PASSWORD
         app:
-          name: ZEXTENTION
+          name: ZHR_ESS_LEAVREQ
           description: null
-          package: ZPON
-          transport: A4HK900057
+          package: ZHR0043
+          transport: HRDK901203

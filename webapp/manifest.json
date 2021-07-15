@@ -41,7 +41,30 @@
 	"sap.ui5": {
 		"_version": "1.1.0",
 		"dependencies": {
-			"minUI5Version": "1.84.1"
+			"minUI5Version": "1.84.1",
+			"libs": {
+				"sap.m": {
+					"lazy": false
+				},
+				"sap.ui.core": {
+					"lazy": false
+				},
+				"sap.ui.layout": {
+					"lazy": false
+				},
+				"sap.ui.unified": {
+					"lazy": false
+				},
+				"sap.ushell": {
+					"lazy": false
+				},
+				"sap.uxap": {
+					"lazy": false
+				},
+				"hcm.fab.lib.common": {
+					"lazy": false
+				}
+			}
 		},
 		"extends": {
 			"component": "hcm.fab.myleaverequest",
