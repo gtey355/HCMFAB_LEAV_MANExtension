@@ -219,7 +219,7 @@ sap.ui.define([
 		//    },
 		onSendRequest: function () {
 
-			this._sendRequest();
+			//this._sendRequest();
 
 			var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
 			var sRootPath = jQuery.sap.getModulePath("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension");
@@ -228,24 +228,25 @@ sap.ui.define([
 			});
 			var sMsgText = i18nModel.getResourceBundle().getText("msgPEP");
 
-			/* 			new Promise(function(resolve, reject) {
-							sap.m.MessageBox.confirm(
-								sMsgText, {
-									actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-									styleClass: bCompact ? "sapUiSizeCompact" : "",
-									onClose: function(sAction) {
-										if (sAction === 'OK') {
-											resolve(true);
-										}
-									}
-								}
-							);
-						}).then(function() {
-			
-							//this._sendRequest();
-						}.bind(this)); */
+			new Promise(function (resolve, reject) {
+				sap.m.MessageBox.confirm(
+					sMsgText, {
+					actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+					styleClass: bCompact ? "sapUiSizeCompact" : "",
+					onClose: function (sAction) {
+						if (sAction === 'OK') {
+							resolve(true);
+						}
+					}
+				}
+				);
+			}).then(function () {
+
+				this._sendRequest();
+			}.bind(this));
 
 		},
+		
 
 		_sendRequest: function () {
 			var oOriginalProperties = {},
