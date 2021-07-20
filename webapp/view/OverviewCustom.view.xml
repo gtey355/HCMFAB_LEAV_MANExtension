@@ -172,7 +172,7 @@
 							<ColumnListItem type="Navigation" id="leaveRequestColumnListItem">
 								<cells>
 									<!-- Leave Type -->
-									<ObjectIdentifier id="leaveTypeCell" title="{overview>AbsenceTypeName}" class="sapMTableContentMargin"/>
+									<ObjectIdentifier id="leaveTypeCell" title="{overview>ZzAbsnLtext}" class="sapMTableContentMargin"/>
 									<!-- Validity -->
 									<ObjectAttribute id="validityCell"
 										text="{parts:[ {path:'overview>StartDate', type: 'sap.ui.model.odata.type.DateTime', formatOptions: { style: 'medium' }, constraints: { displayFormat : 'Date' }}, {path:'overview>EndDate', type: 'sap.ui.model.odata.type.DateTime', formatOptions: { style: 'medium' }, constraints: { displayFormat : 'Date' }} ], formatter:'.formatter.formatOverviewLeaveDates'}"
