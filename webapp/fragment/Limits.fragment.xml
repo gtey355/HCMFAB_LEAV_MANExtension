@@ -32,7 +32,7 @@
 				<ColumnListItem type="{= ${device>/system/phone} ? 'Navigation' : 'Inactive' }" id="limitColumnListItem">
 					<cells>
 						<!-- Leave Type -->
-						<ObjectIdentifier title="{TimeAccountTypeName}" class="sapMTableContentMargin"/>
+						<ObjectIdentifier title="{ZzLimnLtext}" class="sapMTableContentMargin"/>
 						<!-- Available  -->
 						<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'AvailableQuantity', type: 'sap.ui.model.odata.type.Byte'}"
 							state="Success"
