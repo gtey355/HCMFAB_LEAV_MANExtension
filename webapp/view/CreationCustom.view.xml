@@ -32,7 +32,7 @@
 								showSecondaryValues="true" enabled="{= !!${AbsenceTypeCode}}" visible="{= ${create>/sEditMode} !== 'DELETE'}"
 								ariaLabelledBy="quotaAvailabilityLabelInvTxt, quotaAvailabilityText, absDescLabel, absDescText">
 								<items>
-									<core:ListItem id="selectionTypeItem" key="{AbsenceTypeCode}" text="{AbsenceTypeName}" additionalText="{AbsenceTypeCode}"/>
+									<core:ListItem id="selectionTypeItem" key="{AbsenceTypeCode}" text="{ZzAbsnLtext}" additionalText="{AbsenceTypeCode}"/>
 								</items>
 							</Select>
 							<Input id="absenceTypeInptNotEditable" change="onInputHoursChange" type="Text" editable="false" value="{AbsenceTypeName}"
