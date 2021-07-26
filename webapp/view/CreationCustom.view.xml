@@ -20,7 +20,9 @@
 							press="onOverlapOpen"/>
 					</link>
 				</MessageStrip>
-				<MessageStrip id="hireInfoStrip" text="{i18n>hireMsg}"  showIcon="true" visible="{= !!${create>/bHire}}" class="sapUiTinyMargin">
+				<MessageStrip id="hireInfoStrip" text="{i18n>hireMsg}"  showIcon="true" visible="{= !!${create>/bHire}}" class="sapUiTinyMargin" showCloseButton="true">
+				</MessageStrip>
+				<MessageStrip id="dispInfoStrip" text="{i18n>dispMsg}"  showIcon="true" visible="{= !!${create>/bDisp}}" class="sapUiTinyMargin" showCloseButton="true">
 				</MessageStrip>
 				<!-- Leave Type Selection Simple Form-->
 				<f:SimpleForm id="leaveTypeSelectionForm" title="{i18n>createPageLeaveTypeSelectTitle}" editable="true" layout="ResponsiveGridLayout"

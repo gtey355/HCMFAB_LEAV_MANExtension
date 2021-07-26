@@ -459,32 +459,98 @@ sap.ui.define([
 		//            }
 		//        });
 		//    },
-		//    onAbsenceTypeChange: function (i) {
-		//        var A, p = i.getParameter("selectedItem"), z = this.getView().getBindingContext().getPath();
-		//        if (p) {
-		//            A = p.getBindingContext();
-		//            this.updateOdataModel(A.getObject(), {});
-		//            var G = A.getProperty("toAdditionalFieldsDefinition") || [], K = this._getAdditionalFieldValues(G, this._getCurrentAdditionalFieldValues()), Q = {
-		//                    definition: G,
-		//                    values: K
-		//                };
-		//            this._destroyAdditionalFields();
-		//            this._handleApprovers(z, A.getProperty("toApprover"));
-		//            var R = A.getObject();
-		//            this._updateLocalModel(Q, R, this.oODataModel.getProperty(z + "/StartDate"), this.oODataModel.getProperty(z + "/EndDate"));
-		//            if (!(R.IsRecordInClockTimesAllowed && R.IsAllowedDurationPartialDay)) {
-		//                this.oODataModel.setProperty(z + "/StartTime", "");
-		//                this.oODataModel.setProperty(z + "/EndTime", "");
-		//            }
-		//            if (!(R.IsRecordInClockHoursAllowed && R.IsAllowedDurationPartialDay)) {
-		//                this.oODataModel.setProperty(z + "/PlannedWorkingHours", "0.0");
-		//            }
-		//            this._handleAttachments(A.getObject());
-		//            this._fillAdditionalFields(this.oCreateModel, A.getProperty("AbsenceTypeCode"), this._getAdditionalFieldsContainer());
-		//            this._fillAdditionalFieldTexts(G, K);
-		//            this._updateCalcLeaveDays(false);
-		//        }
-		//    },
+		onAbsenceTypeChange: function (oEvent) {
+			debugger;
+
+			var oAbsenceTypeContext,
+				oAbsenceTypeSelectedItem = oEvent.getParameter("selectedItem"),
+				sLeaveRequestContextPath = this.getView().getBindingContext().getPath();
+
+			if (oAbsenceTypeSelectedItem) {
+				oAbsenceTypeContext = oAbsenceTypeSelectedItem.getBindingContext();
+				this.updateOdataModel(oAbsenceTypeContext.getObject(), {});
+
+				var oAdditionalFieldsDefinitions = oAbsenceTypeContext.getProperty("toAdditionalFieldsDefinition") || [],
+					oAdditionalFieldsValues = this._getAdditionalFieldValues(
+						oAdditionalFieldsDefinitions,
+						this._getCurrentAdditionalFieldValues()
+					),
+					oAdditionalFields = {
+						definition: oAdditionalFieldsDefinitions,
+						values: oAdditionalFieldsValues
+
+					};
+				// important: unbind local model from additional fields when
+				// changing it. Otherwise bad things will happen with unbound
+				// fields.
+				this._destroyAdditionalFields();
+
+				this._handleApprovers(
+					sLeaveRequestContextPath,
+					oAbsenceTypeContext.getProperty("toApprover")
+				);
+
+				var oAbsenceTypeData = oAbsenceTypeContext.getObject();
+				this._updateLocalModel(
+					oAdditionalFields,
+					oAbsenceTypeData,
+					this.oODataModel.getProperty(sLeaveRequestContextPath + "/StartDate"),
+					this.oODataModel.getProperty(sLeaveRequestContextPath + "/EndDate")
+				);
+
+				// clear time / hour fields if they are not used by the new absence type. this prevents inconsistent
+				// values to be sent to CalculateLeaveSpan which makes it return no result.
+				if (!(oAbsenceTypeData.IsRecordInClockTimesAllowed && oAbsenceTypeData.IsAllowedDurationPartialDay)) {
+					this.oODataModel.setProperty(sLeaveRequestContextPath + "/StartTime", "");
+					this.oODataModel.setProperty(sLeaveRequestContextPath + "/EndTime", "");
+				}
+				if (!(oAbsenceTypeData.IsRecordInClockHoursAllowed && oAbsenceTypeData.IsAllowedDurationPartialDay)) {
+					this.oODataModel.setProperty(sLeaveRequestContextPath + "/PlannedWorkingHours", "0.0");
+				}
+
+				this._handleAttachments(oAbsenceTypeContext.getObject());
+
+				this._fillAdditionalFields(
+					this.oCreateModel,
+					oAbsenceTypeContext.getProperty("AbsenceTypeCode"),
+					this._getAdditionalFieldsContainer()
+				);
+
+				this._fillAdditionalFieldTexts(oAdditionalFieldsDefinitions, oAdditionalFieldsValues);
+
+				this._updateCalcLeaveDays(false);
+
+				// viperebatov
+				// check subty = 2006 (from parameters) and show message if it is true
+				var sAbsType = oAbsenceTypeContext.getProperty('AbsenceTypeCode');
+				this._checkDispFromBackend(sAbsType);
+			}
+		},
+
+		_checkDispFromBackend: function (sAbsType) {
+			
+
+			new Promise(function (resolve, reject) {
+				this.oODataModel.callFunction("/checkAbsenceFromParam", {
+					urlParameters: {
+						Subty: sAbsType
+					},
+					method: "GET",
+					success: function (response) {
+						resolve(response);
+					},
+					error: function (error) {
+						reject(error);
+					}
+				});
+			}.bind(this)).then(function (oData) {
+
+				
+				this.oCreateModel.setProperty("/bDisp", oData.checkAbsenceFromParam.ZzCheckDisp);
+			}.bind(this));
+
+		},
+
 		//    onShowLeaveTypeDescriptionPressed: function (i) {
 		//        if (!this._oLeaveTypeDescriptionDialog) {
 		//            var V = this.getView();
@@ -1180,7 +1246,7 @@ sap.ui.define([
 					this._revalidateSaveButtonStatus();
 
 					// проверка на кол-во отработанных месяцев
-					
+
 					var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
 					new Promise(function (resolve, reject) {
 						this.oODataModel.callFunction("/ZGetHire", {
@@ -1196,8 +1262,8 @@ sap.ui.define([
 							}
 						});
 					}.bind(this)).then(function (oData) {
-						
-						this.oCreateModel.setProperty("/bHire", oData.ZGetHire.ZzHire === 'X' );
+
+						this.oCreateModel.setProperty("/bHire", oData.ZGetHire.ZzHire === 'X');
 					}.bind(this));
 
 
