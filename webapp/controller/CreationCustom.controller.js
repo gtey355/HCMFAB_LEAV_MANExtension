@@ -111,15 +111,15 @@ sap.ui.define([
 		utils: utils,
 		oUploadCollection: null,
 		oUploadSet: null,
-		_messagesPopover: null,
-		_notesBuffer: null,
-		_oMessagePopover: null,
-		_oNewFileData: {},
-		_oControlToFocus: null,
-		_bCheckboxFieldsAreBoolean: false,
-		_bApproverOnBehalfPropertyExists: false,
-		_oSearchApproverItemTemplate: null,
-		_bCheckLeaveSpanDateIsEdmTime: false,
+		// _messagesPopover: null,
+		// _notesBuffer: null,
+		// _oMessagePopover: null,
+		// _oNewFileData: {},
+		// _oControlToFocus: null,
+		// _bCheckboxFieldsAreBoolean: false,
+		// _bApproverOnBehalfPropertyExists: false,
+		// _oSearchApproverItemTemplate: null,
+		// _bCheckLeaveSpanDateIsEdmTime: false,
 
 		/* =========================================================== */
 		/* lifecycle methods                                           */
@@ -143,6 +143,8 @@ sap.ui.define([
 				bundleUrl: [sRootPath, "i18n/i18n_custom.properties"].join("/")
 			});
 			this.getView().setModel(i18nModel, "i18n");
+
+
 		},
 
 		//    initLocalModel: function () {
@@ -246,7 +248,7 @@ sap.ui.define([
 			}.bind(this));
 
 		},
-		
+
 
 		_sendRequest: function () {
 			var oOriginalProperties = {},
@@ -415,7 +417,7 @@ sap.ui.define([
 				MessageToast.show(this.getResourceBundle().getText("noChangesFound"));
 			}
 
-		}
+		},
 		//    onCancel: function () {
 		//        this._confirmCancel();
 		//    },
@@ -1051,74 +1053,157 @@ sap.ui.define([
 		//        }
 		//        this.oCreateModel.setProperty("/saveButtonEnabled", this._hasPendingChanges());
 		//    },
-		//    _onCreateRouteMatched: function (i) {
-		//        var R = i.getParameter("arguments"), A = this.getOwnerComponent().getAssignmentPromise();
-		//        this.oErrorHandler.setShowErrors("immediately");
-		//        this.oErrorHandler.clearErrors();
-		//        this.oCreateModel.setProperty("/sEditMode", "CREATE");
-		//        this._notesBuffer = "";
-		//        this._destroyAdditionalFields();
-		//        this._cleanupUnsubmittedViewChanges();
-		//        this.oCreateModel.setProperty("/viewTitle", this.getResourceBundle().getText("createViewTitle"));
-		//        Promise.all([
-		//            this.oODataModel.metadataLoaded(),
-		//            A,
-		//            this.oODataModel.getMetaModel().loaded()
-		//        ]).then(function (p) {
-		//            if (this.sCEEmployeeId !== p[1]) {
-		//                this._absenceTypeReceivedDeferred = u.createDeferred();
-		//                this.sCEEmployeeId = p[1];
-		//                this._oSelectionItemTemplate = this.getView().byId("selectionTypeItem");
-		//                this.oCreateModel.setProperty("/busy", true);
-		//                this.getView().byId("absenceType").bindItems({
-		//                    path: "/AbsenceTypeSet",
-		//                    template: this._oSelectionItemTemplate,
-		//                    filters: [new F("EmployeeID", b.EQ, this.sCEEmployeeId)],
-		//                    parameters: { expand: "toAdditionalFieldsDefinition,toApprover" },
-		//                    events: { dataReceived: this.onAbsenceTypeReceived.bind(this) }
-		//                });
-		//            }
-		//            this._oDataUtil = D.getInstance(this.sCEEmployeeId, this.getModel());
-		//            this._initOverlapCalendar();
-		//            this._absenceTypeReceivedDeferred.promise.then(function (z) {
-		//                var G = z, V, K;
-		//                this.oCreateModel.setProperty("/busy", false);
-		//                V = this.createLeaveRequestCollection();
-		//                this.getView().setBindingContext(V);
-		//                var Q = G.filter(function (a1) {
-		//                    if (R.absenceType && R.absenceType !== "default") {
-		//                        return a1.AbsenceTypeCode === R.absenceType;
-		//                    } else {
-		//                        return a1.DefaultType;
-		//                    }
-		//                });
-		//                if (Q.length !== 0) {
-		//                    K = Q[0];
-		//                } else {
-		//                    K = G[0].AbsenceTypeCode;
-		//                }
-		//                this.updateOdataModel(K, R);
-		//                var W = this.getSelectedAbsenceTypeControl();
-		//                var X = jQuery.extend(true, {}, K);
-		//                var Y = W.getBindingContext();
-		//                var Z = Y.getProperty("toAdditionalFieldsDefinition") || [];
-		//                var $ = this._getAdditionalFieldValues(Z, {});
-		//                var _ = {
-		//                    definition: Z,
-		//                    values: $
-		//                };
-		//                this._handleApprovers(V.getPath(), Y.getProperty("toApprover"));
-		//                this._updateLocalModel(_, X, this.oODataModel.getProperty(V.getPath() + "/StartDate"), this.oODataModel.getProperty(V.getPath() + "/EndDate"));
-		//                this._handleAttachments(X);
-		//                this._fillAdditionalFields(this.oCreateModel, X.AbsenceTypeCode, this._getAdditionalFieldsContainer());
-		//                this._fillAdditionalFieldTexts(Z, $);
-		//                this._updateCalcLeaveDays(false);
-		//                this.oCreateModel.setProperty("/busy", false);
-		//                this._rememberChangeRelevantLocalModelProperties();
-		//                this._revalidateSaveButtonStatus();
-		//            }.bind(this));
-		//        }.bind(this));
-		//    },
+		/*
+* This is the handler called when the route is matched. This handler
+* is called before any events are triggered by the view (e.g.,
+* onAbsenceTypeReceived).
+*/
+		_onCreateRouteMatched: function (oEvent) {
+			var oRouteArgs = oEvent.getParameter("arguments"),
+				oAssignmentPromise = this.getOwnerComponent().getAssignmentPromise();
+
+			this.oErrorHandler.setShowErrors("immediately");
+			this.oErrorHandler.clearErrors();
+			this.oCreateModel.setProperty("/sEditMode", "CREATE");
+			this._notesBuffer = "";
+
+			//
+			// Actions that don't depend on all the absence type being
+			// retrieved below...
+			//
+			this._destroyAdditionalFields();
+			this._cleanupUnsubmittedViewChanges();
+
+			this.oCreateModel.setProperty("/viewTitle", this.getResourceBundle().getText("createViewTitle"));
+
+			Promise.all([
+				this.oODataModel.metadataLoaded(),
+				oAssignmentPromise,
+				this.oODataModel.getMetaModel().loaded()
+			]).then(function (aPromiseResults) {
+				// did the assignment change?
+				if (this.sCEEmployeeId !== aPromiseResults[1]) {
+					this._absenceTypeReceivedDeferred = utils.createDeferred();
+
+					// update binding
+					this.sCEEmployeeId = aPromiseResults[1];
+					this._oSelectionItemTemplate = this.getView().byId("selectionTypeItem");
+					this.oCreateModel.setProperty("/busy", true);
+
+					this.getView().byId("absenceType").bindItems({
+						path: "/AbsenceTypeSet",
+						template: this._oSelectionItemTemplate,
+						filters: [new Filter("EmployeeID", FilterOperator.EQ, this.sCEEmployeeId)],
+						parameters: {
+							expand: "toAdditionalFieldsDefinition,toApprover"
+						},
+						events: {
+							dataReceived: this.onAbsenceTypeReceived.bind(this)
+						}
+					});
+				}
+
+				// Initialize data utility class
+				this._oDataUtil = DataUtil.getInstance(this.sCEEmployeeId, this.getModel());
+
+				// Initialize overlap calendar
+				this._initOverlapCalendar();
+
+				this._absenceTypeReceivedDeferred.promise.then(function (oAbsenceTypeResult) {
+					var aAbsenceTypesInDropdown = oAbsenceTypeResult,
+						oViewBindingContext,
+						oSelectedAbsenceType;
+
+					this.oCreateModel.setProperty("/busy", false);
+
+					// Create a new entry and prepare to edit it...
+					oViewBindingContext = this.createLeaveRequestCollection();
+					this.getView().setBindingContext(oViewBindingContext);
+
+					// get default absence type code
+					var aDefaultAbsenceTypes = aAbsenceTypesInDropdown.filter(function (oAbsenceType) {
+						if (oRouteArgs.absenceType && oRouteArgs.absenceType !== "default") {
+							return oAbsenceType.AbsenceTypeCode === oRouteArgs.absenceType;
+						} else {
+							return oAbsenceType.DefaultType;
+						}
+					});
+					if (aDefaultAbsenceTypes.length !== 0) {
+						oSelectedAbsenceType = aDefaultAbsenceTypes[0];
+					} else {
+						oSelectedAbsenceType = aAbsenceTypesInDropdown[0].AbsenceTypeCode;
+					}
+
+					this.updateOdataModel(oSelectedAbsenceType, oRouteArgs);
+
+					var oSelectedAbsenceTypeControl = this.getSelectedAbsenceTypeControl();
+					var oAbsenceTypeData = jQuery.extend(true, {}, oSelectedAbsenceType);
+					var oAbsenceTypeControlContext = oSelectedAbsenceTypeControl.getBindingContext();
+					var oAdditionalFieldsDefinitions = oAbsenceTypeControlContext.getProperty("toAdditionalFieldsDefinition") || [];
+					var oAdditionalFieldsValues = this._getAdditionalFieldValues(
+						oAdditionalFieldsDefinitions, {} /* non-default values to display */
+					);
+					var oAdditionalFields = {
+						definition: oAdditionalFieldsDefinitions,
+						values: oAdditionalFieldsValues
+					};
+
+					this._handleApprovers(
+						oViewBindingContext.getPath(),
+						oAbsenceTypeControlContext.getProperty("toApprover")
+					);
+
+					this._updateLocalModel(
+						oAdditionalFields,
+						oAbsenceTypeData, this.oODataModel.getProperty(oViewBindingContext.getPath() + "/StartDate"),
+						this.oODataModel.getProperty(oViewBindingContext.getPath() + "/EndDate")
+					);
+
+					this._handleAttachments(oAbsenceTypeData);
+
+					this._fillAdditionalFields(
+						this.oCreateModel,
+						oAbsenceTypeData.AbsenceTypeCode,
+						this._getAdditionalFieldsContainer()
+					);
+
+					this._fillAdditionalFieldTexts(oAdditionalFieldsDefinitions, oAdditionalFieldsValues);
+
+					// calculate potentially used time
+					this._updateCalcLeaveDays(false);
+					// Done
+					this.oCreateModel.setProperty("/busy", false);
+
+					// initialization complete, remember state of local model
+					this._rememberChangeRelevantLocalModelProperties();
+					// and set SAVE button state accordingly
+					this._revalidateSaveButtonStatus();
+
+					// проверка на кол-во отработанных месяцев
+					
+					var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
+					new Promise(function (resolve, reject) {
+						this.oODataModel.callFunction("/ZGetHire", {
+							urlParameters: {
+								EmployeeID: sEmployeeID
+							},
+							method: "GET",
+							success: function (response) {
+								resolve(response);
+							},
+							error: function (error) {
+								reject(error);
+							}
+						});
+					}.bind(this)).then(function (oData) {
+						
+						this.oCreateModel.setProperty("/bHire", oData.ZGetHire.ZzHire === 'X' );
+					}.bind(this));
+
+
+				}.bind(this));
+			}.bind(this));
+		},
 		//    _onDeletePostedLeaveRouteMatched: function (i) {
 		//        this.oCreateModel.setProperty("/sEditMode", "DELETE");
 		//        this._onEditRouteMatchedInternal(i);
