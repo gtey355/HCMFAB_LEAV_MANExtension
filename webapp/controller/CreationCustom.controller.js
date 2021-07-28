@@ -460,7 +460,6 @@ sap.ui.define([
 		//        });
 		//    },
 		onAbsenceTypeChange: function (oEvent) {
-			debugger;
 
 			var oAbsenceTypeContext,
 				oAbsenceTypeSelectedItem = oEvent.getParameter("selectedItem"),
@@ -522,14 +521,15 @@ sap.ui.define([
 
 				// viperebatov
 				// check subty = 2006 (from parameters) and show message if it is true
+				
 				var sAbsType = oAbsenceTypeContext.getProperty('AbsenceTypeCode');
 				this._checkDispFromBackend(sAbsType);
+				
 			}
 		},
 
 		_checkDispFromBackend: function (sAbsType) {
 			
-
 			new Promise(function (resolve, reject) {
 				this.oODataModel.callFunction("/checkAbsenceFromParam", {
 					urlParameters: {
@@ -544,12 +544,13 @@ sap.ui.define([
 					}
 				});
 			}.bind(this)).then(function (oData) {
-
-				
+		
 				this.oCreateModel.setProperty("/bDisp", oData.checkAbsenceFromParam.ZzCheckDisp);
 			}.bind(this));
 
 		},
+
+		
 
 		//    onShowLeaveTypeDescriptionPressed: function (i) {
 		//        if (!this._oLeaveTypeDescriptionDialog) {
@@ -1245,6 +1246,7 @@ sap.ui.define([
 					// and set SAVE button state accordingly
 					this._revalidateSaveButtonStatus();
 
+					//vperebatov
 					// проверка на кол-во отработанных месяцев
 
 					var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
@@ -1264,6 +1266,26 @@ sap.ui.define([
 					}.bind(this)).then(function (oData) {
 
 						this.oCreateModel.setProperty("/bHire", oData.ZGetHire.ZzHire === 'X');
+					}.bind(this));
+					
+
+					// проверка на совместителя
+					new Promise(function (resolve, reject) {
+						this.oODataModel.callFunction("/checkCE", {
+							urlParameters: {
+								EmployeeID: sEmployeeID
+							},
+							method: "GET",
+							success: function (response) {
+								resolve(response);
+							},
+							error: function (error) {
+								reject(error);
+							}
+						});
+					}.bind(this)).then(function (oData) {
+			
+						this.oCreateModel.setProperty("/bCe", oData.checkCE.ZzCe);
 					}.bind(this));
 
 
