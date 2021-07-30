@@ -13,14 +13,17 @@ builder:
       - /localService/**
   customTasks:
     - name: deploy-to-abap
-      
       afterTask: generateCachebusterInfo
       configuration:
-      
+        ignoreCertError: true
+        connection:
+          client: "100"
+          useStrictSSL: false
         target:
           url: https://vhmgthrdci.hec.corp.tander.ru:44300
           client: "100"
           auth: basic
+          useStrictSSL: false
         credentials:
           username: env:UI5_USERNAME
           password: env:UI5_PASSWORD
