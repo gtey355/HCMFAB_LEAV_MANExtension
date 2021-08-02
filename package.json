@@ -31,10 +31,12 @@
   "ui5": {
     "dependencies": [
       "@sap/ux-ui5-tooling",
-      "ui5-task-nwabap-deployer"
+      "ui5-task-nwabap-deployer",
+      "ui5-task-transpile"
     ]
   },
   "dependencies": {
-    "@sap/abap-deploy": "^0.10.23"
+    "@sap/abap-deploy": "^0.10.23",
+    "ui5-task-transpile": "^0.3.1"
   }
 }
