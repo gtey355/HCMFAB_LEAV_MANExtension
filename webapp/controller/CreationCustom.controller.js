@@ -144,51 +144,53 @@ sap.ui.define([
 			});
 			this.getView().setModel(i18nModel, "i18n");
 
-
 		},
 
-		//    initLocalModel: function () {
-		//        this.setModelProperties(this.oCreateModel, {
-		//            "uploadPercentage": 0,
-		//            "multiOrSingleDayRadioGroupIndex": 0,
-		//            "isQuotaCalculated": undefined,
-		//            "BalanceAvailableQuantityText": undefined,
-		//            "TimeUnitName": undefined,
-		//            "attachments": [],
-		//            "isAttachmentMandatory": false,
-		//            "isAttachmentUploadEnabled": true,
-		//            "notes": "",
-		//            "showDatePicker": false,
-		//            "showRange": true,
-		//            "usedWorkingTime": undefined,
-		//            "usedWorkingTimeUnit": undefined,
-		//            "aProposedApprovers": [],
-		//            "AdditionalFields": [],
-		//            "showTimePicker": false,
-		//            "showInputHours": false,
-		//            "timePickerFilled": false,
-		//            "inputHoursFilled": false,
-		//            "viewTitle": null,
-		//            "busy": false,
-		//            "sEditMode": null,
-		//            "iMaxApproverLevel": 0,
-		//            "iCurrentApproverLevel": 0,
-		//            "IsMultiLevelApproval": false,
-		//            "isApproverEditable": false,
-		//            "isApproverVisible": false,
-		//            "isAddDeleteApproverAllowed": false,
-		//            "isNoteVisible": false,
-		//            "AbsenceDescription": "",
-		//            "AbsenceTypeName": "",
-		//            "isSaveRequestPending": false,
-		//            "saveButtonEnabled": false,
-		//            "calendar": {
-		//                overlapNumber: 0,
-		//                assignmentId: this.sCEEmployeeId,
-		//                opened: false
-		//            }
-		//        }, undefined, false);
-		//    },
+		   initLocalModel: function () {
+		       this.setModelProperties(this.oCreateModel, {
+		           "uploadPercentage": 0,
+		           "multiOrSingleDayRadioGroupIndex": 0,
+		           "isQuotaCalculated": undefined,
+		           "BalanceAvailableQuantityText": undefined,
+		           "TimeUnitName": undefined,
+		           "attachments": [],
+		           "isAttachmentMandatory": false,
+		           "isAttachmentUploadEnabled": true,
+		           "notes": "",
+		           "showDatePicker": false,
+		           "showRange": true,
+		           "usedWorkingTime": undefined,
+		           "usedWorkingTimeUnit": undefined,
+		           "aProposedApprovers": [],
+		           "AdditionalFields": [],
+		           "showTimePicker": false,
+		           "showInputHours": false,
+		           "timePickerFilled": false,
+		           "inputHoursFilled": false,
+		           "viewTitle": null,
+		           "busy": false,
+		           "sEditMode": null,
+		           "iMaxApproverLevel": 0,
+		           "iCurrentApproverLevel": 0,
+		           "IsMultiLevelApproval": false,
+		           "isApproverEditable": false,
+		           "isApproverVisible": false,
+		           "isAddDeleteApproverAllowed": false,
+		           "isNoteVisible": false,
+		           "AbsenceDescription": "",
+		           "AbsenceTypeName": "",
+		           "isSaveRequestPending": false,
+		           "saveButtonEnabled": false,
+		           "calendar": {
+		               overlapNumber: 0,
+		               assignmentId: this.sCEEmployeeId,
+		               opened: false
+		           },
+				   "bHire": false,
+				   "bDisp": false,
+				   "bCe": false
+		       }, undefined, false);
+		   },
 		//    onAbsenceTypeReceived: function (i) {
 		//        var p;
 		//        p = i.getParameter("data").results;

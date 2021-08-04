@@ -29,14 +29,7 @@ builder:
           password: env:UI5_PASSWORD
         app:
           name: ZHR_ESS_LEAVREQ
-          description: null
+          description: "new descr"
           package: ZHR0043
           transport: HRDK901203
-    - name: ui5-task-transpile
-      afterTask: replaceVersion
-      configuration:
-        debug: true
-        removeConsoleStatements: true
-        transpileAsync: true
-        excludePatterns:
-        - "lib/"
+  
