@@ -32,4 +32,13 @@ builder:
           description: "new descr"
           package: ZHR0043
           transport: HRDK901203
-  
+    - name: ui5-task-transpile
+      afterTask: replaceVersion
+      configuration:
+        debug: true
+        removeConsoleStatements: true
+        transpileAsync: true
+        excludePatterns:
+        - "lib/"
+        - "another/dir/in/webapp"
+        - "yet/another/dir"
