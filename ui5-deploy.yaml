@@ -2,7 +2,7 @@
 
 specVersion: '1.0'
 metadata:
-  name: 'extention'
+  name: 'ZHR_ESS_LEAVREQ'
 type: application
 ui5Theme: sap_fiori_3
 builder:
