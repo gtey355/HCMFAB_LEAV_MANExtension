@@ -145,6 +145,9 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 
 			// Read Leave Request with in sync with Default Start value
 			this._readLeaveRequestWithDefaultStartDate(sEmployeeId);
+
+			// check if first xss sign availables
+			this._checkFirstXssSign(sEmployeeId);
 		}
 	},
 
@@ -157,6 +160,66 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 			this._oOverviewModel.setProperty("/limitStartDate", new Date());
 			oEvent.preventDefault();
 		}
+
+	},
+
+	_checkFirstXssSign: function(sEmployeeId) {
+		
+		
+		new Promise(function (resolve, reject) {
+			this.oODataModel.callFunction("/checkFirstSign", {
+				urlParameters: {
+					EmployeeID: sEmployeeId
+				},
+				method: "GET",
+				success: function (response) {
+					resolve(response);
+				},
+				error: function (error) {
+					reject(error);
+				}
+			});
+		}.bind(this)).then(function (oData) {
+			
+			if (oData.checkFirstSign.ZzInfo === 'X') {
+				var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
+				let i18nModel = this.getView().getModel("i18n");
+				var sMsgText = i18nModel.getResourceBundle().getText("msgFirstXssSign");
+	
+				new Promise(function (resolve, reject) {
+					sap.m.MessageBox.confirm(
+						sMsgText, {
+						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+						styleClass: bCompact ? "sapUiSizeCompact" : "",
+						onClose: function (sAction) {
+							if (sAction === 'OK') {
+								resolve(true);
+							}
+						}
+					}
+					);
+				}).then(function () {
+					
+					this._setFirstXssSign(sEmployeeId);
+				}.bind(this));
+			}
+		}.bind(this));
+
+	},
+
+	_setFirstXssSign: function(sEmployeeId) {
+		this.oODataModel.callFunction("/setFirstXssSign", {
+			urlParameters: {
+				EmployeeID: sEmployeeId
+			},
+			method: "POST",
+			success: function (response) {	
+			},
+			error: function (error) {	
+			}
+		});
+
+
 
 	}
 	//	_readEntitlements: function(E) {
