@@ -185,22 +185,31 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 				var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
 				let i18nModel = this.getView().getModel("i18n");
 				var sMsgText = i18nModel.getResourceBundle().getText("msgFirstXssSign");
+				let bRes;
 	
 				new Promise(function (resolve, reject) {
+					
 					sap.m.MessageBox.confirm(
 						sMsgText, {
 						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
 						styleClass: bCompact ? "sapUiSizeCompact" : "",
 						onClose: function (sAction) {
 							if (sAction === 'OK') {
-								resolve(true);
+								bRes = true;
+							} else {
+								bRes = false;
 							}
+							resolve(bRes);
 						}
 					}
 					);
-				}).then(function () {
-					
-					this._setFirstXssSign(sEmployeeId);
+				}).then(function (bRes) {
+					if (bRes) {
+						this._setFirstXssSign(sEmployeeId);
+					} else {
+						this._goBack();
+					}
+				
 				}.bind(this));
 			}
 		}.bind(this));
@@ -218,9 +227,16 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 			error: function (error) {	
 			}
 		});
+	},
 
+	_goBack: function() {
+		
+		var oHistory = sap.ui.core.routing.History.getInstance();
+        var sPreviousHash = oHistory.getPreviousHash();
 
-
+        if (typeof sPreviousHash !== "undefined") {
+          window.history.go(-1);
+        }
 	}
 	//	_readEntitlements: function(E) {
 	//
