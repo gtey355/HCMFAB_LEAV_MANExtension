@@ -152,7 +152,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 	},
 
 	onLimitDateChanged: function (oEvent) {
-		
+
 		var oDatePicker = oEvent.getSource();
 		var iSelectedDate = +oDatePicker.getDateValue();
 		var iNow = +(new Date());
@@ -163,9 +163,9 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 
 	},
 
-	_checkFirstXssSign: function(sEmployeeId) {
-		
-		
+	_checkFirstXssSign: function (sEmployeeId) {
+
+
 		new Promise(function (resolve, reject) {
 			this.oODataModel.callFunction("/checkFirstSign", {
 				urlParameters: {
@@ -180,15 +180,15 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 				}
 			});
 		}.bind(this)).then(function (oData) {
-			
+
 			if (oData.checkFirstSign.ZzInfo === 'X') {
 				var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
 				let i18nModel = this.getView().getModel("i18n");
 				var sMsgText = i18nModel.getResourceBundle().getText("msgFirstXssSign");
 				let bRes;
-	
+
 				new Promise(function (resolve, reject) {
-					
+
 					sap.m.MessageBox.confirm(
 						sMsgText, {
 						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
@@ -209,34 +209,44 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 					} else {
 						this._goBack();
 					}
-				
+
 				}.bind(this));
 			}
 		}.bind(this));
 
 	},
 
-	_setFirstXssSign: function(sEmployeeId) {
+	_setFirstXssSign: function (sEmployeeId) {
 		this.oODataModel.callFunction("/setFirstXssSign", {
 			urlParameters: {
 				EmployeeID: sEmployeeId
 			},
 			method: "POST",
-			success: function (response) {	
+			success: function (response) {
 			},
-			error: function (error) {	
+			error: function (error) {
 			}
 		});
 	},
 
-	_goBack: function() {
-		
+	_goBack: function () {
+		debugger;
 		var oHistory = sap.ui.core.routing.History.getInstance();
-        var sPreviousHash = oHistory.getPreviousHash();
+		var sPreviousHash = oHistory.getPreviousHash();
 
-        if (typeof sPreviousHash !== "undefined") {
-          window.history.go(-1);
-        }
+
+		var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation");
+		oCrossAppNavigator.toExternal({
+			target: { shellHash: "#Shell-home" }
+		});
+		/* 	if (sPreviousHash !== undefined || !oCrossAppNavigator.isInitialNavigation()) {
+				// eslint-disable-next-line sap-no-history-manipulation
+				history.go(-1);
+			} else {
+				oCrossAppNavigator.toExternal({
+					target: { shellHash: "#Shell-home" }
+				});
+			} */
 	}
 	//	_readEntitlements: function(E) {
 	//
