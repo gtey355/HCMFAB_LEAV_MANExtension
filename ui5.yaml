@@ -1,6 +1,6 @@
 specVersion: '1.0'
 metadata:
-  name: 'hcmfab_leav_manextension'
+  name: 'zhr0043_leavreq_cr'
 type: application
 ui5Theme: sap_fiori_3
 server:
