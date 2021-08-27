@@ -2,6 +2,7 @@
     "plugins": [
       ["@babel/plugin-transform-for-of", { "assumeArray": true }],
       ["@babel/plugin-transform-computed-properties", { "loose": true }],
-      ["@babel/plugin-transform-destructuring", { "loose": true }]
+      ["@babel/plugin-transform-destructuring", { "loose": true }],
+      ["transform-remove-console", { "exclude": ["error", "warn"] }]
     ]
   }
