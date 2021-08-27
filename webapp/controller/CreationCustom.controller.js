@@ -146,51 +146,51 @@ sap.ui.define([
 
 		},
 
-		   initLocalModel: function () {
-		       this.setModelProperties(this.oCreateModel, {
-		           "uploadPercentage": 0,
-		           "multiOrSingleDayRadioGroupIndex": 0,
-		           "isQuotaCalculated": undefined,
-		           "BalanceAvailableQuantityText": undefined,
-		           "TimeUnitName": undefined,
-		           "attachments": [],
-		           "isAttachmentMandatory": false,
-		           "isAttachmentUploadEnabled": true,
-		           "notes": "",
-		           "showDatePicker": false,
-		           "showRange": true,
-		           "usedWorkingTime": undefined,
-		           "usedWorkingTimeUnit": undefined,
-		           "aProposedApprovers": [],
-		           "AdditionalFields": [],
-		           "showTimePicker": false,
-		           "showInputHours": false,
-		           "timePickerFilled": false,
-		           "inputHoursFilled": false,
-		           "viewTitle": null,
-		           "busy": false,
-		           "sEditMode": null,
-		           "iMaxApproverLevel": 0,
-		           "iCurrentApproverLevel": 0,
-		           "IsMultiLevelApproval": false,
-		           "isApproverEditable": false,
-		           "isApproverVisible": false,
-		           "isAddDeleteApproverAllowed": false,
-		           "isNoteVisible": false,
-		           "AbsenceDescription": "",
-		           "AbsenceTypeName": "",
-		           "isSaveRequestPending": false,
-		           "saveButtonEnabled": false,
-		           "calendar": {
-		               overlapNumber: 0,
-		               assignmentId: this.sCEEmployeeId,
-		               opened: false
-		           },
-				   "bHire": false,
-				   "bDisp": false,
-				   "bCe": false
-		       }, undefined, false);
-		   },
+		initLocalModel: function () {
+			this.setModelProperties(this.oCreateModel, {
+				"uploadPercentage": 0,
+				"multiOrSingleDayRadioGroupIndex": 0,
+				"isQuotaCalculated": undefined,
+				"BalanceAvailableQuantityText": undefined,
+				"TimeUnitName": undefined,
+				"attachments": [],
+				"isAttachmentMandatory": false,
+				"isAttachmentUploadEnabled": true,
+				"notes": "",
+				"showDatePicker": false,
+				"showRange": true,
+				"usedWorkingTime": undefined,
+				"usedWorkingTimeUnit": undefined,
+				"aProposedApprovers": [],
+				"AdditionalFields": [],
+				"showTimePicker": false,
+				"showInputHours": false,
+				"timePickerFilled": false,
+				"inputHoursFilled": false,
+				"viewTitle": null,
+				"busy": false,
+				"sEditMode": null,
+				"iMaxApproverLevel": 0,
+				"iCurrentApproverLevel": 0,
+				"IsMultiLevelApproval": false,
+				"isApproverEditable": false,
+				"isApproverVisible": false,
+				"isAddDeleteApproverAllowed": false,
+				"isNoteVisible": false,
+				"AbsenceDescription": "",
+				"AbsenceTypeName": "",
+				"isSaveRequestPending": false,
+				"saveButtonEnabled": false,
+				"calendar": {
+					overlapNumber: 0,
+					assignmentId: this.sCEEmployeeId,
+					opened: false
+				},
+				"bHire": false,
+				"bDisp": false,
+				"bCe": false
+			}, undefined, false);
+		},
 		//    onAbsenceTypeReceived: function (i) {
 		//        var p;
 		//        p = i.getParameter("data").results;
@@ -379,6 +379,10 @@ sap.ui.define([
 					}
 				}
 
+
+				// vp 26082021
+				this._checkAdvanceInfoMessage();
+
 				// show one or more error messages
 				this.oErrorHandler.pushError(oError);
 				this.oErrorHandler.displayErrorPopup();
@@ -417,6 +421,77 @@ sap.ui.define([
 			} else {
 				//show message toast that nothing was changed
 				MessageToast.show(this.getResourceBundle().getText("noChangesFound"));
+			}
+
+		},
+
+		_checkAdvanceInfoMessage: function () {
+
+
+			let oMessageManager = this.oErrorHandler._oMessageManager;
+
+			let aMessages = oMessageManager.getMessageModel().getData();
+			if (!aMessages.length) {
+				return;
+			}
+
+			let bSomeMessage = aMessages.length > 1 ? true : false;
+			// search ZHR0043_MSG/006
+			let oAbvanceMessage = aMessages.find(msg => msg.description.includes('ZHR0043_MSG/006'));
+			if (!oAbvanceMessage) {
+				return;
+			}
+			// если сообщений несколько, меняем нашу ошибку на инфо
+			// иначе наше сообщение будет выводится как диалог, а оригинальное - удаляем
+			if (bSomeMessage) {
+				oAbvanceMessage.type = 'Information';
+			} else {
+				oMessageManager.removeAllMessages();
+				this.oErrorHandler._aErrors = [];
+				var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
+
+				new Promise(function (resolve, reject) {
+					sap.m.MessageBox.confirm(
+						oAbvanceMessage.message, {
+						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+						styleClass: bCompact ? "sapUiSizeCompact" : "",
+						onClose: function (sAction) {
+							if (sAction === 'CANCEL') {
+								resolve(false);
+							} else {
+								resolve(true);
+							}
+						}
+					}
+					);
+				}.bind(this)).then(function (bRes) {
+					//debugger;
+					var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
+					
+					if (!bRes) {
+						// удаляем лимит и выходим
+						this.oODataModel.callFunction("/DeleteLastLimit", {
+							urlParameters: {
+								EmployeeID: sEmployeeID
+							},
+							method: "GET",
+							success: function (response) {
+								utils.navTo.call(this, "overview");
+							}.bind(this),
+							error: function (error) {
+								utils.navTo.call(this, "overview");
+							}.bind(this)
+						});
+					} else {
+						// перезапускаем заявку 						
+						this._sendRequest();
+					}
+
+					//this._showSuccessStatusMessage();
+				}.bind(this)).catch(function () {
+
+				}.bind(this));
+
 			}
 
 		},
@@ -462,6 +537,8 @@ sap.ui.define([
 		//        });
 		//    },
 		onAbsenceTypeChange: function (oEvent) {
+
+			
 
 			var oAbsenceTypeContext,
 				oAbsenceTypeSelectedItem = oEvent.getParameter("selectedItem"),
@@ -523,15 +600,15 @@ sap.ui.define([
 
 				// viperebatov
 				// check subty = 2006 (from parameters) and show message if it is true
-				
+
 				var sAbsType = oAbsenceTypeContext.getProperty('AbsenceTypeCode');
 				this._checkDispFromBackend(sAbsType);
-				
+
 			}
 		},
 
 		_checkDispFromBackend: function (sAbsType) {
-			
+
 			new Promise(function (resolve, reject) {
 				this.oODataModel.callFunction("/checkAbsenceFromParam", {
 					urlParameters: {
@@ -546,13 +623,13 @@ sap.ui.define([
 					}
 				});
 			}.bind(this)).then(function (oData) {
-		
+
 				this.oCreateModel.setProperty("/bDisp", oData.checkAbsenceFromParam.ZzCheckDisp);
 			}.bind(this));
 
 		},
 
-		
+
 
 		//    onShowLeaveTypeDescriptionPressed: function (i) {
 		//        if (!this._oLeaveTypeDescriptionDialog) {
@@ -1269,7 +1346,7 @@ sap.ui.define([
 
 						this.oCreateModel.setProperty("/bHire", oData.ZGetHire.ZzHire === 'X');
 					}.bind(this));
-					
+
 
 					// проверка на совместителя
 					new Promise(function (resolve, reject) {
@@ -1286,7 +1363,7 @@ sap.ui.define([
 							}
 						});
 					}.bind(this)).then(function (oData) {
-			
+
 						this.oCreateModel.setProperty("/bCe", oData.checkCE.ZzCe);
 					}.bind(this));
 

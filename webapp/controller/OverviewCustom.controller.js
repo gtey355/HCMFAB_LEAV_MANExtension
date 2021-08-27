@@ -230,7 +230,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 	},
 
 	_goBack: function () {
-		debugger;
+		//debugger;
 		var oHistory = sap.ui.core.routing.History.getInstance();
 		var sPreviousHash = oHistory.getPreviousHash();
 
