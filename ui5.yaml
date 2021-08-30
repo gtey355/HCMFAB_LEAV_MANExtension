@@ -24,15 +24,15 @@ server:
     configuration:
      port: 35729
      path: webapp
-builder:
-  customTasks:
-  - name: ui5-task-transpile
-    afterTask: replaceVersion
-    configuration:
-      debug: true
-      removeConsoleStatements: true
-      transpileAsync: true
-      excludePatterns:
-      - "lib/"
-      - "another/dir/in/webapp"
-      - "yet/another/dir"
+# builder:
+#   customTasks:
+#   - name: ui5-task-transpile
+#     afterTask: replaceVersion
+#     configuration:
+#       debug: true
+#       removeConsoleStatements: true
+#       transpileAsync: true
+#       excludePatterns:
+#       - "lib/"
+#       - "another/dir/in/webapp"
+#       - "yet/another/dir"

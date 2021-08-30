@@ -240,7 +240,7 @@
 			<common:ConcurrentEmploymentOverflowToolbarButton id="toolBtnCE" assignmentChange="onAssignmentSwitch"
 				assignmentId="{global>/sEmployeeNumber}" applicationId="MYLEAVEREQUESTS"/>
 			<common:OnBehalfOverflowToolbarButton id="toolBtnOnBehalf" assignmentId="{global>/sEmployeeNumber}" assignmentChange="onAssignmentSwitch"
-				applicationId="MYLEAVEREQUESTS"/>
+				applicationId="MYLEAVEREQUESTS" visible="false"/>
 		</semantic:customFooterContent>
 		<core:InvisibleText id="entitlementTitleInvTxt" text="{i18n>entitlementTabTitle}"/>
 		<core:InvisibleText id="entitlementCountInvTxt" text="{path: 'overview>/entCount', formatter: '.formatter.itemCountFormatterAccessibility'}"/>
