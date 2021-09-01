@@ -380,14 +380,95 @@ sap.ui.define([
 				}
 
 
-				// vp 26082021
-				this._checkAdvanceInfoMessage();
+				// vp 26082021 
+				// проверяем на авансы	
+				debugger;
+				this._checkAdvanceMessage()
+					.then(function ({ bSomeMessage, bNoMessages, bAction, bFindRepeatAdvance }) {
+						debugger;
+						if (bNoMessages || bSomeMessage) { // просто выходим
+							//debugger;
+							//return new Promise.resolve();
+							return;
+						}
 
-				// show one or more error messages
-				this.oErrorHandler.pushError(oError);
-				this.oErrorHandler.displayErrorPopup();
 
-				this.oErrorHandler.setShowErrors("immediately");
+						var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
+						var oDateRange = this.getView().byId("dateRange");
+						var oStartDate = oDateRange.getDateValue();
+						var oEndDate = oDateRange.getSecondDateValue();
+						if (!bFindRepeatAdvance) { // первичный
+							if (!bAction) { // cancel
+								// отмена - удаляем лимит и выходим
+								return new Promise(function (resolve, reject) {
+									this.oODataModel.callFunction("/DeleteLastLimit", {
+										urlParameters: {
+											EmployeeID: sEmployeeID
+										},
+										method: "GET",
+										success: function (response) {
+											resolve({ bNeedNewRequest: false });
+										}.bind(this),
+										error: function (error) {
+											reject(error);
+										}.bind(this)
+									});
+								});
+							} else {
+								// перезапускаем заявку 	
+								return Promise.resolve({ bNeedNewRequest: true });
+							}
+
+						} else { // повторный
+							if (!bAction) {
+								//  отмена - просто выходим
+								return Promise.resolve({ bNeedNewRequest: false });
+
+							} else {
+								// изменяем флаг1 и сохраняем заявку 
+								return new Promise(function (resolve, reject) {
+									this.oODataModel.callFunction("/UpdateFlag1", {
+										urlParameters: {
+											EmployeeID: sEmployeeID,
+											Begda: oStartDate,
+											Endda: oEndDate
+										},
+										method: "GET",
+										success: function (response) {
+											//if (response.UpdateFlag1.ZzOkflag1) {
+											// заново кидаем запрос после изменения флаг1
+											resolve({ bNeedNewRequest: true });
+											//}
+										}.bind(this),
+										error: function (error) {
+											//utils.navTo.call(this, "overview");
+											reject(error);
+										}.bind(this)
+									});
+								}.bind(this));
+							}
+						}
+					}.bind(this))
+					.then(function ({ bNeedNewRequest }) {
+						debugger;
+						// перезапуск запроса если необходимо
+						if (bNeedNewRequest) {
+							this._sendRequest();
+						} else {
+							utils.navTo.call(this, "overview");
+						}
+
+					}.bind(this))
+					.catch(function (oErr) {
+
+					}.bind(this))
+					.finally(function () {
+						// show one or more error messages
+						this.oErrorHandler.pushError(oError);
+						this.oErrorHandler.displayErrorPopup();
+						this.oErrorHandler.setShowErrors("immediately");
+					}.bind(this));
+
 			};
 
 			if (this.oODataModel.hasPendingChanges()) {
@@ -425,76 +506,65 @@ sap.ui.define([
 
 		},
 
-		_checkAdvanceInfoMessage: function () {
-
+		_checkAdvanceMessage: function () {
 
 			let oMessageManager = this.oErrorHandler._oMessageManager;
+			var bFindRepeatAdvance = false;
+			var bNoMessages = false;
+
 
 			let aMessages = oMessageManager.getMessageModel().getData();
 			if (!aMessages.length) {
-				return;
+				bNoMessages = true;
+				return new Promise.resolve({ bNoMessages });
+			}
+			let bSomeMessage = aMessages.length > 1 ? true : false;
+
+			let oMessage;
+			// search ZHR0043_MSG/006
+			let oAbvanceMessage = aMessages.find(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/006') : undefined);
+			// search ZHR0043_MSG/005
+			let oRepeatAbvanceMessage = aMessages.find(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/005') : undefined);
+			if (oAbvanceMessage) {
+				oMessage = oAbvanceMessage;
+			} else if (oRepeatAbvanceMessage) {
+				bFindRepeatAdvance = true;
+				oMessage = oRepeatAbvanceMessage;
 			}
 
-			let bSomeMessage = aMessages.length > 1 ? true : false;
-			// search ZHR0043_MSG/006
-			let oAbvanceMessage = aMessages.find(msg => msg.description.includes('ZHR0043_MSG/006'));
-			if (!oAbvanceMessage) {
-				return;
-			}
-			// если сообщений несколько, меняем нашу ошибку на инфо
+			// если сообщений несколько, меняем нашу ошибку на инфо и идем на след шаг
 			// иначе наше сообщение будет выводится как диалог, а оригинальное - удаляем
 			if (bSomeMessage) {
-				oAbvanceMessage.type = 'Information';
+				oMessage.type = 'Information';
+				return Promise.resolve({ bSomeMessage });
 			} else {
 				oMessageManager.removeAllMessages();
 				this.oErrorHandler._aErrors = [];
 				var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
 
-				new Promise(function (resolve, reject) {
+				return new Promise(function (resolve) {
 					sap.m.MessageBox.confirm(
-						oAbvanceMessage.message, {
+						oMessage.message, {
 						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
 						styleClass: bCompact ? "sapUiSizeCompact" : "",
 						onClose: function (sAction) {
+							//debugger;
 							if (sAction === 'CANCEL') {
-								resolve(false);
+								resolve({ bAction: false, bFindRepeatAdvance });
 							} else {
-								resolve(true);
+								resolve({ bAction: true, bFindRepeatAdvance });
 							}
 						}
 					}
 					);
-				}.bind(this)).then(function (bRes) {
-					//debugger;
-					var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
-					
-					if (!bRes) {
-						// удаляем лимит и выходим
-						this.oODataModel.callFunction("/DeleteLastLimit", {
-							urlParameters: {
-								EmployeeID: sEmployeeID
-							},
-							method: "GET",
-							success: function (response) {
-								utils.navTo.call(this, "overview");
-							}.bind(this),
-							error: function (error) {
-								utils.navTo.call(this, "overview");
-							}.bind(this)
-						});
-					} else {
-						// перезапускаем заявку 						
-						this._sendRequest();
-					}
-
-					//this._showSuccessStatusMessage();
-				}.bind(this)).catch(function () {
-
 				}.bind(this));
 
 			}
 
 		},
+
+
+
 		//    onCancel: function () {
 		//        this._confirmCancel();
 		//    },
@@ -538,7 +608,7 @@ sap.ui.define([
 		//    },
 		onAbsenceTypeChange: function (oEvent) {
 
-			
+
 
 			var oAbsenceTypeContext,
 				oAbsenceTypeSelectedItem = oEvent.getParameter("selectedItem"),
