@@ -252,7 +252,7 @@ sap.ui.define([
 		},
 
 
-		_sendRequest: function () {
+		_sendRequest: function (bRepeat = false) {
 			var oOriginalProperties = {},
 				sPath = this.getView().getBindingContext().getPath();
 
@@ -392,7 +392,6 @@ sap.ui.define([
 							return;
 						}
 
-
 						var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
 						var oDateRange = this.getView().byId("dateRange");
 						var oStartDate = oDateRange.getDateValue();
@@ -453,7 +452,7 @@ sap.ui.define([
 						debugger;
 						// перезапуск запроса если необходимо
 						if (bNeedNewRequest) {
-							this._sendRequest();
+							this._sendRequest(bNeedNewRequest); //  с признаком Повторно
 						} else {
 							utils.navTo.call(this, "overview");
 						}
@@ -463,6 +462,7 @@ sap.ui.define([
 
 					}.bind(this))
 					.finally(function () {
+						debugger;
 						// show one or more error messages
 						this.oErrorHandler.pushError(oError);
 						this.oErrorHandler.displayErrorPopup();
@@ -472,12 +472,16 @@ sap.ui.define([
 			};
 
 			if (this.oODataModel.hasPendingChanges()) {
+				
 				var oParams = {
 					requestID: this.oODataModel.getProperty(sPath + "/RequestID"),
 					aUploadedFiles: [], // information about each uploaded file,
 					leavePath: sPath,
 					showSuccess: true
 				};
+
+				// устанавливаем свойство повторности
+				this.oODataModel.setProperty(sPath + "/IsRepeat", bRepeat); 
 
 				//Forward the information whether we are running in a multiple approver scenario from AbsensceType to the LeaveRequest in create case
 				this.oODataModel.setProperty(sPath + "/IsMultiLevelApproval", this.oCreateModel.getProperty("/IsMultiLevelApproval"));
@@ -508,6 +512,8 @@ sap.ui.define([
 
 		_checkAdvanceMessage: function () {
 
+			debugger;
+
 			let oMessageManager = this.oErrorHandler._oMessageManager;
 			var bFindRepeatAdvance = false;
 			var bNoMessages = false;
@@ -516,7 +522,7 @@ sap.ui.define([
 			let aMessages = oMessageManager.getMessageModel().getData();
 			if (!aMessages.length) {
 				bNoMessages = true;
-				return new Promise.resolve({ bNoMessages });
+				return Promise.resolve({ bNoMessages });
 			}
 			let bSomeMessage = aMessages.length > 1 ? true : false;
 
@@ -530,6 +536,8 @@ sap.ui.define([
 			} else if (oRepeatAbvanceMessage) {
 				bFindRepeatAdvance = true;
 				oMessage = oRepeatAbvanceMessage;
+			} else {
+				return Promise.resolve({ bNoMessages : true });
 			}
 
 			// если сообщений несколько, меняем нашу ошибку на инфо и идем на след шаг
@@ -548,7 +556,7 @@ sap.ui.define([
 						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
 						styleClass: bCompact ? "sapUiSizeCompact" : "",
 						onClose: function (sAction) {
-							//debugger;
+							
 							if (sAction === 'CANCEL') {
 								resolve({ bAction: false, bFindRepeatAdvance });
 							} else {
