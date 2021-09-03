@@ -25,6 +25,9 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 	},
 
 	_readLimits: function (sEmployeeId) {
+		debugger;
+
+		let oLimitStartDate = this.getView().getModel("overview").getProperty("/limitStartDate");
 
 		this._oLimitColumListItemTemplate = this._oLimitColumListItemTemplate ? this._oLimitColumListItemTemplate.clone() :
 			this.getView().byId("limitColumnListItem");
@@ -32,7 +35,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 		this.getView().byId("limitTable").bindItems({
 			path: "/TimeAccountSet",
 			template: this._oLimitColumListItemTemplate,
-			filters: this._getActiveBaseFiltersForTimeAccount(new Date(), sEmployeeId)
+			filters: this._getActiveBaseFiltersForTimeAccount(oLimitStartDate, sEmployeeId)
 		});
 
 
@@ -152,12 +155,14 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 	},
 
 	onLimitDateChanged: function (oEvent) {
+		debugger;
 
 		var oDatePicker = oEvent.getSource();
 		var iSelectedDate = +oDatePicker.getDateValue();
 		var iNow = +(new Date());
 		if (iSelectedDate <= iNow) {
-			this._oOverviewModel.setProperty("/limitStartDate", new Date());
+			this._oOverviewModel.setProperty("/limitStartDate", oDatePicker.getDateValue());
+			this._readLimits(this._sEmployeeNumber);
 			oEvent.preventDefault();
 		}
 
