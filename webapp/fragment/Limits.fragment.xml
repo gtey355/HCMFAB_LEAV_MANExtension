@@ -34,11 +34,13 @@
 						<!-- Leave Type -->
 						<ObjectIdentifier title="{ZzLimnLtext}" class="sapMTableContentMargin"/>
 						<!-- Available  -->
-						<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'AvailableQuantity', type: 'sap.ui.model.odata.type.Decimal'}"
+						<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'AvailableQuantity', 
+							type: 'sap.ui.model.odata.type.Decimal', formatOptions: { decimals : 2 }}"
 							state="Success"
 							unit="{parts:[{path: 'AvailableQuantity'}, {path: 'TimeUnitCode'}, {path: 'TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
 						<!-- Planned  -->
-						<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'PlannedAmount', type: 'sap.ui.model.odata.type.Byte'}"
+						<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'PlannedAmount', 
+							type: 'sap.ui.model.odata.type.Decimal', formatOptions: { decimals : 2 }}"
 							state="None"
 							unit="{parts:[{path: 'PlannedAmount'}, {path: 'TimeUnitCode'}, {path: 'TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
 					</cells>
