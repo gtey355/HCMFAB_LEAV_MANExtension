@@ -160,7 +160,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 		var oDatePicker = oEvent.getSource();
 		var iSelectedDate = +oDatePicker.getDateValue();
 		var iNow = +(new Date());
-		if (iSelectedDate <= iNow) {
+		if (iSelectedDate >= iNow) {
 			this._oOverviewModel.setProperty("/limitStartDate", oDatePicker.getDateValue());
 			this._readLimits(this._sEmployeeNumber);
 			
