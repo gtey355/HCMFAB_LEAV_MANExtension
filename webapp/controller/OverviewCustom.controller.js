@@ -155,7 +155,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 	},
 
 	onLimitDateChanged: function (oEvent) {
-		//debugger;
+		debugger;
 
 		var oDatePicker = oEvent.getSource();
 		var iSelectedDate = +oDatePicker.getDateValue();
@@ -168,10 +168,10 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 			let o18nModel = this.getView().getModel("i18n");
 			var sMsgText = o18nModel.getResourceBundle().getText("msgDate");
 			sap.m.MessageBox.alert(sMsgText);
-			oDatePicker.setDateValue(new Date());
-
-			//oEvent.preventDefault();
+			oDatePicker.setDateValue(new Date());			
 		}
+
+		oEvent.preventDefault();
 
 	},
 
