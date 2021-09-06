@@ -382,10 +382,10 @@ sap.ui.define([
 
 				// vp 26082021 
 				// проверяем на авансы	
-				debugger;
+				//debugger;
 				this._checkAdvanceMessage()
 					.then(function ({ bSomeMessage, bNoMessages, bAction, bFindRepeatAdvance }) {
-						debugger;
+						//debugger;
 						if (bNoMessages || bSomeMessage) { // просто выходим
 							//debugger;
 							//return new Promise.resolve();
@@ -449,7 +449,7 @@ sap.ui.define([
 						}
 					}.bind(this))
 					.then(function ({ bNeedNewRequest }) {
-						debugger;
+						//debugger;
 						// перезапуск запроса если необходимо
 						if (bNeedNewRequest) {
 							this._sendRequest(bNeedNewRequest); //  с признаком Повторно
@@ -462,7 +462,7 @@ sap.ui.define([
 
 					}.bind(this))
 					.finally(function () {
-						debugger;
+						//debugger;
 						// show one or more error messages
 						this.oErrorHandler.pushError(oError);
 						this.oErrorHandler.displayErrorPopup();
@@ -512,7 +512,7 @@ sap.ui.define([
 
 		_checkAdvanceMessage: function () {
 
-			debugger;
+			//debugger;
 
 			let oMessageManager = this.oErrorHandler._oMessageManager;
 			var bFindRepeatAdvance = false;

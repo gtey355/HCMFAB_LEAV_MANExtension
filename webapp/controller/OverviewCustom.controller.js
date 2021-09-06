@@ -25,7 +25,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 	},
 
 	_readLimits: function (sEmployeeId) {
-		debugger;
+		//debugger;
 
 		let oLimitStartDate = this.getView().getModel("overview").getProperty("/limitStartDate");
 
@@ -155,7 +155,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 	},
 
 	onLimitDateChanged: function (oEvent) {
-		debugger;
+		//debugger;
 
 		var oDatePicker = oEvent.getSource();
 		var iSelectedDate = +oDatePicker.getDateValue();
@@ -163,7 +163,14 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 		if (iSelectedDate <= iNow) {
 			this._oOverviewModel.setProperty("/limitStartDate", oDatePicker.getDateValue());
 			this._readLimits(this._sEmployeeNumber);
-			oEvent.preventDefault();
+			
+		} else {
+			let o18nModel = this.getView().getModel("i18n");
+			var sMsgText = o18nModel.getResourceBundle().getText("msgDate");
+			sap.m.MessageBox.alert(sMsgText);
+			oDatePicker.setDateValue(new Date());
+
+			//oEvent.preventDefault();
 		}
 
 	},
