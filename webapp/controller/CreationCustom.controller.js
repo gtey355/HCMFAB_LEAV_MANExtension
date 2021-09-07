@@ -1,5 +1,6 @@
 sap.ui.define([
 	"hcm/fab/myleaverequest/utils/formatters",
+	"hcm/fab/myleaverequest/HCMFAB_LEAV_MANExtension/formatter/formatterExt",
 	"hcm/fab/myleaverequest/utils/utils",
 	"hcm/fab/myleaverequest/controller/BaseController",
 	"hcm/fab/myleaverequest/utils/DataUtil",
@@ -34,7 +35,7 @@ sap.ui.define([
 	"sap/m/StandardListItem",
 	"sap/m/DateRangeSelection",
 	"sap/m/DatePicker"
-], function (formatter, utils, BaseController, DataUtil, CalendarUtil, Device, History, Filter, FilterOperator, Context, Decimal, Event,
+], function (formatter, formatterExt, utils, BaseController, DataUtil, CalendarUtil, Device, History, Filter, FilterOperator, Context, Decimal, Event,
 	Label, Input, Title,
 	MessagePopover,
 	MessagePopoverItem,
@@ -108,6 +109,7 @@ sap.ui.define([
 		oCreateModel: null,
 		sCEEmployeeId: undefined,
 		formatter: formatter,
+		formatterExt: formatterExt,
 		utils: utils,
 		oUploadCollection: null,
 		oUploadSet: null,

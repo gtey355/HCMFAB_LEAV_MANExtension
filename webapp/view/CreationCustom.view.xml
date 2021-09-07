@@ -137,7 +137,7 @@
 						<!-- Quota Usage Information -->
 						<Label id="daysTimeUsageLabel" required="false" text="{i18n>quotaUsageInfo}" labelFor="daysTimeUsagetext" visible="{device>/system/phone}"/>
 						<Text id="daysTimeUsagetext"
-							text="{ parts: [ 'create>/usedWorkingTime', 'create>/usedWorkingTimeUnit'], formatter:'.formatter.formatQuotaUsage' }"
+							text="{ parts: [ 'create>/usedWorkingTime', 'create>/usedWorkingTimeUnit'], formatter:'.formatterExt.formatQuotaUsageExt' }"
 							visible="{= ${create>/isQuotaCalculated} &amp;&amp; ${formatter:'.formatter.isGroupEnabled', parts: [ { path: 'StartDate' }, { path: 'AbsenceTypeCode' }]}}"/>
 						<!-- Approvers -->
 						<core:Fragment id="approverFragment" fragmentName="hcm.fab.myleaverequest.view.fragments.ApproverCreateSimpleForm" type="XML"/>

@@ -5,6 +5,8 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 	 * Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
 	 * @memberOf hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.OverviewCustom
 	 */
+
+	
 	onInit: function () {
 
 		var i18nModel = new sap.ui.model.resource.ResourceModel({
@@ -21,6 +23,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 		// set initial values
 		var oOverviewModel = this.getView().getModel("overview");
 		oOverviewModel.setProperty("/limitStartDate", new Date());
+		
 
 	},
 
@@ -155,7 +158,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 	},
 
 	onLimitDateChanged: function (oEvent) {
-		debugger;
+		
 
 		var oDatePicker = oEvent.getSource();
 		var iSelectedDate = +oDatePicker.getDateValue();
