@@ -387,7 +387,7 @@ sap.ui.define([
 				//debugger;
 				this._checkAdvanceMessage()
 					.then(function ({ bSomeMessage, bNoMessages, bAction, bFindRepeatAdvance }) {
-						//debugger;
+						debugger;
 						if (bNoMessages || bSomeMessage) { // просто выходим
 							//debugger;
 							//return new Promise.resolve();
@@ -400,8 +400,9 @@ sap.ui.define([
 						var oEndDate = oDateRange.getSecondDateValue();
 						if (!bFindRepeatAdvance) { // первичный
 							if (!bAction) { // cancel
-								// отмена - удаляем лимит и выходим
-								return new Promise(function (resolve, reject) {
+								// отмена -  выходим
+								return Promise.resolve({ bNeedNewRequest: false });
+								/* return new Promise(function (resolve, reject) {
 									this.oODataModel.callFunction("/DeleteLastLimit", {
 										urlParameters: {
 											EmployeeID: sEmployeeID
@@ -414,10 +415,24 @@ sap.ui.define([
 											reject(error);
 										}.bind(this)
 									});
-								});
+								}); */
 							} else {
-								// перезапускаем заявку 	
-								return Promise.resolve({ bNeedNewRequest: true });
+								// генерим лимит 	
+								//return Promise.resolve({ bNeedNewRequest: true });
+								return new Promise(function (resolve, reject) {
+									this.oODataModel.callFunction("/GenLimit", {
+										urlParameters: {
+											EmployeeID: sEmployeeID
+										},
+										method: "GET",
+										success: function (response) {
+											resolve({ bNeedNewRequest: false });
+										}.bind(this),
+										error: function (error) {
+											reject(error);
+										}.bind(this)
+									});
+								});
 							}
 
 						} else { // повторный
@@ -451,10 +466,10 @@ sap.ui.define([
 						}
 					}.bind(this))
 					.then(function ({ bNeedNewRequest }) {
-						//debugger;
+						debugger;
 						// перезапуск запроса если необходимо
 						if (bNeedNewRequest) {
-							this._sendRequest(bNeedNewRequest); //  с признаком Повторно
+							//this._sendRequest(bNeedNewRequest); //  с признаком Повторно
 						} else {
 							utils.navTo.call(this, "overview");
 						}
