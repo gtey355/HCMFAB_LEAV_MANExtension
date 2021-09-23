@@ -398,41 +398,35 @@ sap.ui.define([
 						var oDateRange = this.getView().byId("dateRange");
 						var oStartDate = oDateRange.getDateValue();
 						var oEndDate = oDateRange.getSecondDateValue();
+						var sAbsType = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().AbsenceTypeCode;
 						if (!bFindRepeatAdvance) { // первичный
 							if (!bAction) { // cancel
 								// отмена -  выходим
 								return Promise.resolve({ bNeedNewRequest: false });
-								/* return new Promise(function (resolve, reject) {
-									this.oODataModel.callFunction("/DeleteLastLimit", {
-										urlParameters: {
-											EmployeeID: sEmployeeID
-										},
-										method: "GET",
-										success: function (response) {
-											resolve({ bNeedNewRequest: false });
-										}.bind(this),
-										error: function (error) {
-											reject(error);
-										}.bind(this)
-									});
-								}); */
+			
 							} else {
 								// генерим лимит 	
 								//return Promise.resolve({ bNeedNewRequest: true });
 								return new Promise(function (resolve, reject) {
+									debugger;
 									this.oODataModel.callFunction("/GenLimit", {
 										urlParameters: {
-											EmployeeID: sEmployeeID
+											EmployeeID: sEmployeeID,
+											Begda: oStartDate,
+											Endda: oEndDate,		
+											AbsType: sAbsType
+
 										},
 										method: "GET",
 										success: function (response) {
-											resolve({ bNeedNewRequest: false });
+											// после расширения лимита перезапускаем запрос
+											resolve({ bNeedNewRequest: true });
 										}.bind(this),
 										error: function (error) {
 											reject(error);
 										}.bind(this)
 									});
-								});
+								}.bind(this));
 							}
 
 						} else { // повторный
@@ -469,7 +463,7 @@ sap.ui.define([
 						debugger;
 						// перезапуск запроса если необходимо
 						if (bNeedNewRequest) {
-							//this._sendRequest(bNeedNewRequest); //  с признаком Повторно
+							this._sendRequest(bNeedNewRequest); //  с признаком Повторно
 						} else {
 							utils.navTo.call(this, "overview");
 						}
