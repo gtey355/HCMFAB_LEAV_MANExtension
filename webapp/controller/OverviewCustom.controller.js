@@ -180,7 +180,6 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 
 	_checkFirstXssSign: function (sEmployeeId) {
 
-
 		new Promise(function (resolve, reject) {
 			this.oODataModel.callFunction("/checkFirstSign", {
 				urlParameters: {
@@ -200,6 +199,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 				var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
 				let i18nModel = this.getView().getModel("i18n");
 				var sMsgText = i18nModel.getResourceBundle().getText("msgFirstXssSign");
+				var sDetailInfo = i18nModel.getResourceBundle().getText("detailInfo");
 				let bRes;
 
 				new Promise(function (resolve, reject) {
@@ -208,6 +208,7 @@ sap.ui.controller("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.controller.Ov
 						sMsgText, {
 						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
 						styleClass: bCompact ? "sapUiSizeCompact" : "",
+						details: sDetailInfo,
 						onClose: function (sAction) {
 							if (sAction === 'OK') {
 								bRes = true;
