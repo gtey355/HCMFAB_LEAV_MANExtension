@@ -3,6 +3,18 @@ metadata:
   name: 'zhr0043_leavreq_cr'
 type: application
 ui5Theme: sap_fiori_3
+resources:
+    configuration:
+        propertiesFileSourceEncoding: UTF-8
+builder:
+  ignoreCertError: true
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
+  customTasks:
+    - name: ui5-task-babel
+      afterTask: replaceVersion
 server:
   customMiddleware:
   - name: fiori-tools-proxy
@@ -24,15 +36,4 @@ server:
     configuration:
      port: 35729
      path: webapp
-# builder:
-#   customTasks:
-#   - name: ui5-task-transpile
-#     afterTask: replaceVersion
-#     configuration:
-#       debug: true
-#       removeConsoleStatements: true
-#       transpileAsync: true
-#       excludePatterns:
-#       - "lib/"
-#       - "another/dir/in/webapp"
-#       - "yet/another/dir"
+

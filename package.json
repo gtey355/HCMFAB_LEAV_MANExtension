@@ -21,19 +21,29 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@sap/ux-ui5-tooling": "1",
-    "@ui5/cli": "^2.10.4",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.6",
+    "@sap/ux-ui5-tooling": "^1.3.5",
+    "@ui5/cli": "^2.13.0",
     "@ui5/fs": "^2.0.6",
     "@ui5/logger": "^2.0.1",
     "babel-plugin-transform-async-to-promises": "^0.8.15",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "rimraf": "3.0.2",
-    "ui5-task-transpile": "^0.3.0"
+    "ui5-task-babel": "^2.1.0",
+    "ui5-task-transpile": "^0.3.0",
+    "ui5-task-zipper": "^0.4.4"
   },
   "ui5": {
     "dependencies": [
       "@sap/ux-ui5-tooling",
-      "ui5-task-transpile"
+      "ui5-task-zipper",
+      "@ui5/cli",
+      "@ui5/fs",
+      "@ui5/logger",
+      "rimraf",
+      "ui5-task-zipper",
+      "ui5-task-babel"
     ]
   }
 }
