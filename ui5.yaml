@@ -12,9 +12,9 @@ builder:
     excludes:
       - /test/**
       - /localService/**
-  customTasks:
-    - name: ui5-task-babel
-      afterTask: replaceVersion
+  # customTasks:
+  #   - name: ui5-task-babel
+  #     afterTask: replaceVersion
 server:
   customMiddleware:
   - name: fiori-tools-proxy
