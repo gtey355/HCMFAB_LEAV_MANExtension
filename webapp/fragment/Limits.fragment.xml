@@ -1,7 +1,7 @@
 <c:FragmentDefinition xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:c="sap.ui.core" xmlns:t="sap.ui.table">
 	<Panel id="limitPanel" expandable="true" expanded="{overview>/entitlementsExpanded}" headerText="{i18n>limitTabTitle}" width="auto">
 		<!--updateFinished must be replaced -->
-		<Table id="limitTable" items="{}" updateFinished="onUpdateFinishedLimits" growing="true" growingThreshold="5" inset="false"
+		<Table id="limitTable" items="{}" updateFinished="onUpdateFinishedLimits" growing="false" inset="false"
 			growingScrollToLoad="false" busyIndicatorDelay="0">
 			<headerToolbar>
 				<OverflowToolbar>
