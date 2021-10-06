@@ -6,7 +6,7 @@ sap.ui.define([
 	"use strict";
 
     function formatQuotaUsageExt(sNumber, sNumberUnit) {
-        debugger;
+        //debugger;
 
 		var sRootPath = jQuery.sap.getModulePath("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension");
 		var i18nModel = new sap.ui.model.resource.ResourceModel({

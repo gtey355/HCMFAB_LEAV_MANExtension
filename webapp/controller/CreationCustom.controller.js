@@ -190,7 +190,8 @@ sap.ui.define([
 				},
 				"bHire": false,
 				"bDisp": false,
-				"bCe": false
+				"bCe": false,
+				"bSud": false
 			}, undefined, false);
 		},
 		//    onAbsenceTypeReceived: function (i) {
@@ -1454,6 +1455,25 @@ sap.ui.define([
 					}.bind(this)).then(function (oData) {
 
 						this.oCreateModel.setProperty("/bCe", oData.checkCE.ZzCe);
+					}.bind(this));
+
+					// проверка на судимость
+					new Promise(function (resolve, reject) {
+						this.oODataModel.callFunction("/checkSud", {
+							urlParameters: {
+								EmployeeID: sEmployeeID
+							},
+							method: "GET",
+							success: function (response) {
+								resolve(response);
+							},
+							error: function (error) {
+								reject(error);
+							}
+						});
+					}.bind(this)).then(function (oData) {
+
+						this.oCreateModel.setProperty("/bSud", oData.checkSud.ZzSud);
 					}.bind(this));
 
 

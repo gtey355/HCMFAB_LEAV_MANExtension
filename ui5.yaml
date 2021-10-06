@@ -34,6 +34,7 @@ server:
   - name: fiori-tools-appreload
     afterMiddleware: compression
     configuration:
-     port: 35729
-     path: webapp
+      ignoreCertError: true
+      port: 35729
+      path: webapp
 

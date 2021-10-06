@@ -26,6 +26,8 @@
 				</MessageStrip>
 				<MessageStrip id="ceInfoStrip" text="{i18n>ceMsg}"  showIcon="true" visible="{= !!${create>/bCe}}" class="sapUiTinyMargin" showCloseButton="true">
 				</MessageStrip>
+				<MessageStrip id="sudInfoStrip" text="{i18n>sudMsg}"  showIcon="true" visible="{= !!${create>/bSud}}" class="sapUiTinyMargin" showCloseButton="true">
+				</MessageStrip>
 				<!-- Leave Type Selection Simple Form-->
 				<f:SimpleForm id="leaveTypeSelectionForm" title="{i18n>createPageLeaveTypeSelectTitle}" editable="true" layout="ResponsiveGridLayout"
 					labelSpanXL="-1" emptySpanXL="-1" columnsXL="-1" labelSpanL="3" emptySpanL="4" columnsL="1" labelSpanM="3" emptySpanM="4" columnsM="1"
