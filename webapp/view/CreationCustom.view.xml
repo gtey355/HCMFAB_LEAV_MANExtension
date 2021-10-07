@@ -13,7 +13,7 @@
 				<common:OnBehalfIndicator id="createOnBehalfIndicator" applicationId="MYLEAVEREQUESTS"/>
 				<!-- Overlap Calendar MessageStrip (DESKTOP / TABLET) -->
 				<MessageStrip id="overlapCalendarInfoStrip" text="{formatter: '.formatter.getCalendarOverlapText', path: 'create>/calendar/overlapNumber'}"
-					type="Information" showIcon="true" visible="{= ${create>/calendar/overlapNumber} > 0 &amp;&amp; !${device>/system/phone}}"
+					type="Information" showIcon="true" visible="{= ${create>/calendar/overlapNumber} > 0 &amp;&amp; !${device>/system/phone} &amp;&amp; false}"
 					class="sapUiTinyMargin">
 					<link>
 						<Link id="timeOverlapCalendarLink" text="{i18n>calendarShowConflicts}" visible="{= (${create>/calendar/overlapNumber} > 0) }"
