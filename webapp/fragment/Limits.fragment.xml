@@ -1,17 +1,16 @@
-<c:FragmentDefinition xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:c="sap.ui.core" xmlns:t="sap.ui.table">
+<c:FragmentDefinition xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:c="sap.ui.core"
+	xmlns:t="sap.ui.table">
 	<Panel id="limitPanel" expandable="true" expanded="{overview>/entitlementsExpanded}" headerText="{i18n>limitTabTitle}" width="auto">
 		<!--updateFinished must be replaced -->
-		<Table id="limitTable" items="{}" updateFinished="onUpdateFinishedLimits" growing="false" inset="false"
-			growingScrollToLoad="false" busyIndicatorDelay="0">
+		<Table id="limitTable" items="{}" updateFinished="onUpdateFinishedLimits" growing="false" inset="false" growingScrollToLoad="false" busyIndicatorDelay="0">
 			<headerToolbar>
 				<OverflowToolbar>
-					<Title id="limitCount" text="{path: 'overview>/entCount', formatter: '.formatter.itemCountFormatter'}" titleStyle="Auto" level="Auto"
-						visible="{= !${device>/system/phone}}"/>
+					<Title id="limitCount" text="{path: 'overview>/entCount', formatter: '.formatter.itemCountFormatter'}" titleStyle="Auto" level="Auto" visible="{= !${device>/system/phone}}"/>
 					<ToolbarSpacer/>
 					<Label text="{i18n>showOn}" visible="{= !${device>/system/phone}}"/>
-					<DatePicker id="limitDatePicker"
-						value="{ path: 'overview>/limitStartDate', type:'sap.ui.model.type.Date', formatOptions: { style: 'medium', strictParsing: true , UTC: false } }"
-						change="onLimitDateChanged" width="10rem" tooltip="{i18n>showLimitFrom}" ariaLabelledBy="limitDatePickerAccLabel"/>
+					<DatePicker id="limitDatePicker" value="{ path: 'overview>/limitStartDate', type:'sap.ui.model.type.Date', formatOptions: { style: 'medium', strictParsing: true , UTC: false } }" change="onLimitDateChanged" width="10rem" tooltip="{i18n>showLimitFrom}" ariaLabelledBy="limitDatePickerAccLabel"/>
 				</OverflowToolbar>
 			</headerToolbar>
 			<columns>
@@ -24,9 +23,9 @@
 					<Text text="{i18n>availableText}"/>
 				</Column>
 				<!-- Planned  -->
-				<Column id="plannedLimitCol" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
+				<!-- <Column id="plannedLimitCol" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
 					<Text text="{i18n>plannedLimitText}"/>
-				</Column>
+				</Column> -->
 			</columns>
 			<items>
 				<ColumnListItem type="{= ${device>/system/phone} ? 'Navigation' : 'Inactive' }" id="limitColumnListItem">
@@ -35,17 +34,21 @@
 						<ObjectIdentifier title="{ZzLimnLtext}" class="sapMTableContentMargin"/>
 						<!-- Available  -->
 						<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'AvailableQuantity', 
-							type: 'sap.ui.model.odata.type.Decimal', formatOptions: { decimals : 2 }}"
-							state="Success"
-							unit="{parts:[{path: 'AvailableQuantity'}, {path: 'TimeUnitCode'}, {path: 'TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
+							type: 'sap.ui.model.odata.type.Decimal', formatOptions: { decimals : 2 }}" state="Success" unit="{parts:[{path: 'AvailableQuantity'}, {path: 'TimeUnitCode'}, {path: 'TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
 						<!-- Planned  -->
 						<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'PlannedAmount', 
-							type: 'sap.ui.model.odata.type.Decimal', formatOptions: { decimals : 2 }}"
-							state="None"
-							unit="{parts:[{path: 'PlannedAmount'}, {path: 'TimeUnitCode'}, {path: 'TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
+							type: 'sap.ui.model.odata.type.Decimal', formatOptions: { decimals : 2 }}" state="None" unit="{parts:[{path: 'PlannedAmount'}, {path: 'TimeUnitCode'}, {path: 'TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
 					</cells>
 				</ColumnListItem>
 			</items>
 		</Table>
+		<FlexBox alignItems="Start" justifyContent="Start">
+			<Label text="{i18n>plannedLimitText}" class="sapUiMediumMarginEnd sapUiSmallMarginBegin" visible="true"/>
+			<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'overview>/PlannedAmount', 
+							type: 'sap.ui.model.odata.type.Decimal', formatOptions: { decimals : 2 }}" state="None" unit="{parts:[{path: 'overview>/PlannedAmount'}, {path: 'overview>/TimeUnitCode'}, {path: 'overview>/TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
+		</FlexBox>
+
+
 	</Panel>
+
 </c:FragmentDefinition>
