@@ -43,8 +43,8 @@
 			</items>
 		</Table>
 		<FlexBox alignItems="Start" justifyContent="Start">
-			<Label text="{i18n>plannedLimitText}" class="sapUiMediumMarginEnd sapUiSmallMarginBegin" visible="true"/>
-			<ObjectNumber class="sapMTableContentMargin" emphasized="true" number="{path:'overview>/PlannedAmount', 
+			<Label text="{i18n>plannedLimitText}" class="sapUiMediumMarginEnd sapUiSmallMarginBegin sapUiSmallMarginTop" visible="true"/>
+			<ObjectNumber class="sapMTableContentMargin sapUiSmallMarginTop" emphasized="true" number="{path:'overview>/PlannedAmount', 
 							type: 'sap.ui.model.odata.type.Decimal', formatOptions: { decimals : 2 }}" state="None" unit="{parts:[{path: 'overview>/PlannedAmount'}, {path: 'overview>/TimeUnitCode'}, {path: 'overview>/TimeUnitName'}], formatter:'.formatter.formatEntitlementTimeunit'}"/>
 		</FlexBox>
 
