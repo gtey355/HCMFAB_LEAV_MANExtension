@@ -53,7 +53,7 @@ sap.ui.controller(
     },
 
     changeLimitBinding: function (oEvent) {
-      debugger;
+      //debugger;
       var oContext = oEvent.getSource().getCurrentContexts()[0] || undefined;
       if (!oContext) {
         return;
@@ -173,7 +173,7 @@ sap.ui.controller(
         this._sEmployeeNumber = sEmployeeId;
 
         // Read the available entitlements
-        this._readEntitlements(sEmployeeId);
+        //this._readEntitlements(sEmployeeId);
 
         // read the available limits
         this._readLimits(sEmployeeId);

@@ -388,7 +388,7 @@ sap.ui.define([
 				//debugger;
 				this._checkAdvanceMessage()
 					.then(function ({ bSomeMessage, bNoMessages, bAction, bFindRepeatAdvance }) {
-						debugger;
+						//debugger;
 						if (bNoMessages || bSomeMessage) { // просто выходим
 							//debugger;
 							//return new Promise.resolve();
@@ -1604,20 +1604,21 @@ sap.ui.define([
 		//            });
 		//        }.bind(this));
 		//    },
-		//    _callAvailableQuotaFunctionImport: function (p) {
-		//        return new Promise(function (R, i) {
-		//            this.oODataModel.callFunction("/CalculateQuotaAvailable", {
-		//                method: "GET",
-		//                urlParameters: p,
-		//                success: function (z) {
-		//                    R(z);
-		//                },
-		//                error: function (z) {
-		//                    i(z);
-		//                }
-		//            });
-		//        }.bind(this));
-		//    },
+		   _callAvailableQuotaFunctionImport: function (p) {
+			   
+		       return new Promise(function (R, i) {
+		           this.oODataModel.callFunction("/ZCalculateQuotaAvailable", {
+		               method: "GET",
+		               urlParameters: p,
+		               success: function (z) {
+		                   R(z);
+		               },
+		               error: function (z) {
+		                   i(z);
+		               }
+		           });
+		       }.bind(this));
+		   },
 		//    _cleanupUnsubmittedViewChanges: function () {
 		//        var i = this.getView().getBindingContext();
 		//        if (!i) {
@@ -1758,27 +1759,27 @@ sap.ui.define([
 		//            this._closeBusyDialog();
 		//        }.bind(this));
 		//    },
-		//    _updateAvailableQuota: function () {
-		//        this.oCreateModel.setProperty("/BalanceAvailableQuantityText", this.getResourceBundle().getText("availabilityCalculation"));
-		//        this._showBusyDialog();
-		//        return this._callAvailableQuotaFunctionImport({
-		//            AbsenceTypeCode: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().AbsenceTypeCode,
-		//            EmployeeID: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID,
-		//            InfoType: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().InfoType
-		//        }).then(function (A) {
-		//            if (!A) {
-		//                this.oCreateModel.setProperty("/BalanceAvailableQuantityText", null);
-		//            } else {
-		//                this.oCreateModel.setProperty("/BalanceAvailableQuantityText", parseFloat(A.CalculateQuotaAvailable.BalanceRestPostedRequested));
-		//                this.oCreateModel.setProperty("/TimeUnitName", A.CalculateQuotaAvailable.TimeUnitText);
-		//            }
-		//            this._closeBusyDialog();
-		//        }.bind(this), function (i) {
-		//            jQuery.sap.log.error("An error occurred while calling AvailableQuota function import", i);
-		//            this.oCreateModel.setProperty("/BalanceAvailableQuantityText", null);
-		//            this._closeBusyDialog();
-		//        }.bind(this));
-		//    },
+		   _updateAvailableQuota: function () {
+		       this.oCreateModel.setProperty("/BalanceAvailableQuantityText", this.getResourceBundle().getText("availabilityCalculation"));
+		       this._showBusyDialog();
+		       return this._callAvailableQuotaFunctionImport({
+		           AbsenceTypeCode: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().AbsenceTypeCode,
+		           EmployeeID: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID,
+		           InfoType: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().InfoType
+		       }).then(function (A) {
+		           if (!A) {
+		               this.oCreateModel.setProperty("/BalanceAvailableQuantityText", null);
+		           } else {
+		               this.oCreateModel.setProperty("/BalanceAvailableQuantityText", parseFloat(A.ZCalculateQuotaAvailable.BalanceRestPostedRequested));
+		               this.oCreateModel.setProperty("/TimeUnitName", A.ZCalculateQuotaAvailable.TimeUnitText);
+		           }
+		           this._closeBusyDialog();
+		       }.bind(this), function (i) {
+		           jQuery.sap.log.error("An error occurred while calling AvailableQuota function import", i);
+		           this.oCreateModel.setProperty("/BalanceAvailableQuantityText", null);
+		           this._closeBusyDialog();
+		       }.bind(this));
+		   },
 		//    _getAttachmentsUploadUrl: function (p) {
 		//        return [
 		//            this.oODataModel.sServiceUrl,
@@ -2358,31 +2359,32 @@ sap.ui.define([
 		//        }
 		//        return z;
 		//    },
-		//    _updateLocalModel: function (A, i, p, z) {
-		//        this.setModelProperties(this.oCreateModel, {
-		//            "multiOrSingleDayRadioGroupIndex": this._getInitialRadioGroupIndex(i, p, z),
-		//            "isAttachmentMandatory": i.AttachmentMandatory,
-		//            "isQuotaCalculated": i.IsQuotaUsed,
-		//            "BalanceAvailableQuantityText": this.getResourceBundle().getText("availabilityCalculation"),
-		//            "AllowedDurationMultipleDayInd": i.IsAllowedDurationMultipleDay,
-		//            "AllowedDurationPartialDayInd": i.IsAllowedDurationPartialDay,
-		//            "AllowedDurationSingleDayInd": i.IsAllowedDurationSingleDay,
-		//            "AdditionalFields": this._getAdditionalFields(A),
-		//            "IsMultiLevelApproval": i.IsMultiLevelApproval,
-		//            "iMaxApproverLevel": i.ApproverLevel,
-		//            "isApproverEditable": !i.IsApproverReadOnly,
-		//            "isApproverVisible": i.IsApproverVisible,
-		//            "isAddDeleteApproverAllowed": i.AddDelApprovers,
-		//            "isNoteVisible": i.IsNoteVisible,
-		//            "showTimePicker": i.IsRecordInClockTimesAllowed && i.IsAllowedDurationPartialDay,
-		//            "showInputHours": i.IsRecordInClockHoursAllowed && i.IsAllowedDurationPartialDay,
-		//            "AbsenceDescription": i.AbsenceDescription ? i.AbsenceDescription : null,
-		//            "AbsenceTypeName": i.AbsenceTypeName
-		//        });
-		//        if (i.IsQuotaUsed) {
-		//            this._updateAvailableQuota();
-		//        }
-		//    },
+		   _updateLocalModel: function (A, i, p, z) {
+			   //debugger;
+		       this.setModelProperties(this.oCreateModel, {
+		           "multiOrSingleDayRadioGroupIndex": this._getInitialRadioGroupIndex(i, p, z),
+		           "isAttachmentMandatory": i.AttachmentMandatory,
+		           "isQuotaCalculated": i.IsQuotaUsed,
+		           "BalanceAvailableQuantityText": this.getResourceBundle().getText("availabilityCalculation"),
+		           "AllowedDurationMultipleDayInd": i.IsAllowedDurationMultipleDay,
+		           "AllowedDurationPartialDayInd": i.IsAllowedDurationPartialDay,
+		           "AllowedDurationSingleDayInd": i.IsAllowedDurationSingleDay,
+		           "AdditionalFields": this._getAdditionalFields(A),
+		           "IsMultiLevelApproval": i.IsMultiLevelApproval,
+		           "iMaxApproverLevel": i.ApproverLevel,
+		           "isApproverEditable": !i.IsApproverReadOnly,
+		           "isApproverVisible": i.IsApproverVisible,
+		           "isAddDeleteApproverAllowed": i.AddDelApprovers,
+		           "isNoteVisible": i.IsNoteVisible,
+		           "showTimePicker": i.IsRecordInClockTimesAllowed && i.IsAllowedDurationPartialDay,
+		           "showInputHours": i.IsRecordInClockHoursAllowed && i.IsAllowedDurationPartialDay,
+		           "AbsenceDescription": i.AbsenceDescription ? i.AbsenceDescription : null,
+		           "AbsenceTypeName": i.AbsenceTypeName
+		       });
+		       if (i.IsQuotaUsed) {
+		           this._updateAvailableQuota();
+		       }
+		   },
 		//    _updateLeaveRequestWithModifiedAttachments: function (i, p) {
 		//        var z = i.getProperty(p);
 		//        var A = Array.apply(null, { length: w }).map(function (Q, R) {

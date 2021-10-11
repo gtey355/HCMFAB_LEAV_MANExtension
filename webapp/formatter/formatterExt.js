@@ -48,7 +48,26 @@ sap.ui.define([
 		return sAvailableDays;
 	}
 
+	function formatQuotaAvailabilityExt(sAvailabilityAmount, bIsQuotaRelevant, sTimeUnit) {
+		debugger;
+		if (bIsQuotaRelevant === false) {
+			return this.getResourceBundle().getText("noQuotaRelevance");
+		}
+		var fParsedNumber = parseFloat(sAvailabilityAmount);
+		if (!isNaN(fParsedNumber)) {
+			
+			var sAmountFormatted = availableDays(sAvailabilityAmount);
+			if (fParsedNumber === 1) {
+				return this.getResourceBundle().getText("availableTxt", [sAmountFormatted > 0 ? sAmountFormatted : 0, sTimeUnit]);
+			} else {
+				return this.getResourceBundle().getText("availableTxtPlural", [sAmountFormatted > 0 ? sAmountFormatted : 0, sTimeUnit]);
+			}
+		}
+		return sAvailabilityAmount;
+	}
+
 	return {
-		formatQuotaUsageExt: formatQuotaUsageExt
+		formatQuotaUsageExt: formatQuotaUsageExt,
+		formatQuotaAvailabilityExt: formatQuotaAvailabilityExt
 	}
 });
