@@ -349,6 +349,7 @@ sap.ui.define([
 			HANDLE SUBMIT
 			*/
 			var fnError = function (oError) {
+				debugger;
 				this.oCreateModel.setProperty("/busy", false);
 				this.oCreateModel.setProperty("/uploadPercentage", 0);
 
@@ -404,30 +405,10 @@ sap.ui.define([
 							if (!bAction) { // cancel
 								// отмена -  выходим
 								return Promise.resolve({ bNeedNewRequest: false });
-			
-							} else {
-								// генерим лимит 	
-								//return Promise.resolve({ bNeedNewRequest: true });
-								return new Promise(function (resolve, reject) {
-									debugger;
-									this.oODataModel.callFunction("/GenLimit", {
-										urlParameters: {
-											EmployeeID: sEmployeeID,
-											Begda: oStartDate,
-											Endda: oEndDate,		
-											AbsType: sAbsType
 
-										},
-										method: "GET",
-										success: function (response) {
-											// после расширения лимита перезапускаем запрос
-											resolve({ bNeedNewRequest: true });
-										}.bind(this),
-										error: function (error) {
-											reject(error);
-										}.bind(this)
-									});
-								}.bind(this));
+							} else {
+								//  сохраняем  заявку
+								return Promise.resolve({ bNeedNewRequest: true });
 							}
 
 						} else { // повторный
@@ -462,6 +443,10 @@ sap.ui.define([
 					}.bind(this))
 					.then(function ({ bNeedNewRequest }) {
 						debugger;
+						// удаляем старые ошибки
+						this.oErrorHandler.pushError(oError);
+						this.oErrorHandler.displayErrorPopup();
+						this.oErrorHandler.setShowErrors("immediately");
 						// перезапуск запроса если необходимо
 						if (bNeedNewRequest) {
 							this._sendRequest(bNeedNewRequest); //  с признаком Повторно
@@ -474,17 +459,17 @@ sap.ui.define([
 
 					}.bind(this))
 					.finally(function () {
-						//debugger;
+						debugger;
 						// show one or more error messages
-						this.oErrorHandler.pushError(oError);
-						this.oErrorHandler.displayErrorPopup();
-						this.oErrorHandler.setShowErrors("immediately");
+						//if (!bNeedNewRequest) {
+
+						//}
 					}.bind(this));
 
 			};
 
 			if (this.oODataModel.hasPendingChanges()) {
-				
+
 				var oParams = {
 					requestID: this.oODataModel.getProperty(sPath + "/RequestID"),
 					aUploadedFiles: [], // information about each uploaded file,
@@ -493,7 +478,7 @@ sap.ui.define([
 				};
 
 				// устанавливаем свойство повторности
-				this.oODataModel.setProperty(sPath + "/IsRepeat", bRepeat); 
+				this.oODataModel.setProperty(sPath + "/IsRepeat", bRepeat);
 
 				//Forward the information whether we are running in a multiple approver scenario from AbsensceType to the LeaveRequest in create case
 				this.oODataModel.setProperty(sPath + "/IsMultiLevelApproval", this.oCreateModel.getProperty("/IsMultiLevelApproval"));
@@ -524,7 +509,7 @@ sap.ui.define([
 
 		_checkAdvanceMessage: function () {
 
-			//debugger;
+			debugger;
 
 			let oMessageManager = this.oErrorHandler._oMessageManager;
 			var bFindRepeatAdvance = false;
@@ -549,7 +534,7 @@ sap.ui.define([
 				bFindRepeatAdvance = true;
 				oMessage = oRepeatAbvanceMessage;
 			} else {
-				return Promise.resolve({ bNoMessages : true });
+				return Promise.resolve({ bNoMessages: true });
 			}
 
 			// если сообщений несколько, меняем нашу ошибку на инфо и идем на след шаг
@@ -568,7 +553,7 @@ sap.ui.define([
 						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
 						styleClass: bCompact ? "sapUiSizeCompact" : "",
 						onClose: function (sAction) {
-							
+
 							if (sAction === 'CANCEL') {
 								resolve({ bAction: false, bFindRepeatAdvance });
 							} else {
@@ -1604,21 +1589,21 @@ sap.ui.define([
 		//            });
 		//        }.bind(this));
 		//    },
-		   _callAvailableQuotaFunctionImport: function (p) {
-			   
-		       return new Promise(function (R, i) {
-		           this.oODataModel.callFunction("/ZCalculateQuotaAvailable", {
-		               method: "GET",
-		               urlParameters: p,
-		               success: function (z) {
-		                   R(z);
-		               },
-		               error: function (z) {
-		                   i(z);
-		               }
-		           });
-		       }.bind(this));
-		   },
+		_callAvailableQuotaFunctionImport: function (p) {
+
+			return new Promise(function (R, i) {
+				this.oODataModel.callFunction("/ZCalculateQuotaAvailable", {
+					method: "GET",
+					urlParameters: p,
+					success: function (z) {
+						R(z);
+					},
+					error: function (z) {
+						i(z);
+					}
+				});
+			}.bind(this));
+		},
 		//    _cleanupUnsubmittedViewChanges: function () {
 		//        var i = this.getView().getBindingContext();
 		//        if (!i) {
@@ -1759,27 +1744,27 @@ sap.ui.define([
 		//            this._closeBusyDialog();
 		//        }.bind(this));
 		//    },
-		   _updateAvailableQuota: function () {
-		       this.oCreateModel.setProperty("/BalanceAvailableQuantityText", this.getResourceBundle().getText("availabilityCalculation"));
-		       this._showBusyDialog();
-		       return this._callAvailableQuotaFunctionImport({
-		           AbsenceTypeCode: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().AbsenceTypeCode,
-		           EmployeeID: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID,
-		           InfoType: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().InfoType
-		       }).then(function (A) {
-		           if (!A) {
-		               this.oCreateModel.setProperty("/BalanceAvailableQuantityText", null);
-		           } else {
-		               this.oCreateModel.setProperty("/BalanceAvailableQuantityText", parseFloat(A.ZCalculateQuotaAvailable.BalanceRestPostedRequested));
-		               this.oCreateModel.setProperty("/TimeUnitName", A.ZCalculateQuotaAvailable.TimeUnitText);
-		           }
-		           this._closeBusyDialog();
-		       }.bind(this), function (i) {
-		           jQuery.sap.log.error("An error occurred while calling AvailableQuota function import", i);
-		           this.oCreateModel.setProperty("/BalanceAvailableQuantityText", null);
-		           this._closeBusyDialog();
-		       }.bind(this));
-		   },
+		_updateAvailableQuota: function () {
+			this.oCreateModel.setProperty("/BalanceAvailableQuantityText", this.getResourceBundle().getText("availabilityCalculation"));
+			this._showBusyDialog();
+			return this._callAvailableQuotaFunctionImport({
+				AbsenceTypeCode: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().AbsenceTypeCode,
+				EmployeeID: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID,
+				InfoType: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().InfoType
+			}).then(function (A) {
+				if (!A) {
+					this.oCreateModel.setProperty("/BalanceAvailableQuantityText", null);
+				} else {
+					this.oCreateModel.setProperty("/BalanceAvailableQuantityText", parseFloat(A.ZCalculateQuotaAvailable.BalanceRestPostedRequested));
+					this.oCreateModel.setProperty("/TimeUnitName", A.ZCalculateQuotaAvailable.TimeUnitText);
+				}
+				this._closeBusyDialog();
+			}.bind(this), function (i) {
+				jQuery.sap.log.error("An error occurred while calling AvailableQuota function import", i);
+				this.oCreateModel.setProperty("/BalanceAvailableQuantityText", null);
+				this._closeBusyDialog();
+			}.bind(this));
+		},
 		//    _getAttachmentsUploadUrl: function (p) {
 		//        return [
 		//            this.oODataModel.sServiceUrl,
@@ -2359,32 +2344,32 @@ sap.ui.define([
 		//        }
 		//        return z;
 		//    },
-		   _updateLocalModel: function (A, i, p, z) {
-			   //debugger;
-		       this.setModelProperties(this.oCreateModel, {
-		           "multiOrSingleDayRadioGroupIndex": this._getInitialRadioGroupIndex(i, p, z),
-		           "isAttachmentMandatory": i.AttachmentMandatory,
-		           "isQuotaCalculated": i.IsQuotaUsed,
-		           "BalanceAvailableQuantityText": this.getResourceBundle().getText("availabilityCalculation"),
-		           "AllowedDurationMultipleDayInd": i.IsAllowedDurationMultipleDay,
-		           "AllowedDurationPartialDayInd": i.IsAllowedDurationPartialDay,
-		           "AllowedDurationSingleDayInd": i.IsAllowedDurationSingleDay,
-		           "AdditionalFields": this._getAdditionalFields(A),
-		           "IsMultiLevelApproval": i.IsMultiLevelApproval,
-		           "iMaxApproverLevel": i.ApproverLevel,
-		           "isApproverEditable": !i.IsApproverReadOnly,
-		           "isApproverVisible": i.IsApproverVisible,
-		           "isAddDeleteApproverAllowed": i.AddDelApprovers,
-		           "isNoteVisible": i.IsNoteVisible,
-		           "showTimePicker": i.IsRecordInClockTimesAllowed && i.IsAllowedDurationPartialDay,
-		           "showInputHours": i.IsRecordInClockHoursAllowed && i.IsAllowedDurationPartialDay,
-		           "AbsenceDescription": i.AbsenceDescription ? i.AbsenceDescription : null,
-		           "AbsenceTypeName": i.AbsenceTypeName
-		       });
-		       if (i.IsQuotaUsed) {
-		           this._updateAvailableQuota();
-		       }
-		   },
+		_updateLocalModel: function (A, i, p, z) {
+			//debugger;
+			this.setModelProperties(this.oCreateModel, {
+				"multiOrSingleDayRadioGroupIndex": this._getInitialRadioGroupIndex(i, p, z),
+				"isAttachmentMandatory": i.AttachmentMandatory,
+				"isQuotaCalculated": i.IsQuotaUsed,
+				"BalanceAvailableQuantityText": this.getResourceBundle().getText("availabilityCalculation"),
+				"AllowedDurationMultipleDayInd": i.IsAllowedDurationMultipleDay,
+				"AllowedDurationPartialDayInd": i.IsAllowedDurationPartialDay,
+				"AllowedDurationSingleDayInd": i.IsAllowedDurationSingleDay,
+				"AdditionalFields": this._getAdditionalFields(A),
+				"IsMultiLevelApproval": i.IsMultiLevelApproval,
+				"iMaxApproverLevel": i.ApproverLevel,
+				"isApproverEditable": !i.IsApproverReadOnly,
+				"isApproverVisible": i.IsApproverVisible,
+				"isAddDeleteApproverAllowed": i.AddDelApprovers,
+				"isNoteVisible": i.IsNoteVisible,
+				"showTimePicker": i.IsRecordInClockTimesAllowed && i.IsAllowedDurationPartialDay,
+				"showInputHours": i.IsRecordInClockHoursAllowed && i.IsAllowedDurationPartialDay,
+				"AbsenceDescription": i.AbsenceDescription ? i.AbsenceDescription : null,
+				"AbsenceTypeName": i.AbsenceTypeName
+			});
+			if (i.IsQuotaUsed) {
+				this._updateAvailableQuota();
+			}
+		},
 		//    _updateLeaveRequestWithModifiedAttachments: function (i, p) {
 		//        var z = i.getProperty(p);
 		//        var A = Array.apply(null, { length: w }).map(function (Q, R) {

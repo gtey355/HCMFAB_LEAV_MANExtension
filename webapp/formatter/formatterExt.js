@@ -49,7 +49,7 @@ sap.ui.define([
 	}
 
 	function formatQuotaAvailabilityExt(sAvailabilityAmount, bIsQuotaRelevant, sTimeUnit) {
-		debugger;
+		
 		if (bIsQuotaRelevant === false) {
 			return this.getResourceBundle().getText("noQuotaRelevance");
 		}
