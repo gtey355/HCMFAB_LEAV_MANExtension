@@ -402,43 +402,10 @@ sap.ui.define([
 						var oEndDate = oDateRange.getSecondDateValue();
 						var sAbsType = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().AbsenceTypeCode;
 						if (!bFindRepeatAdvance) { // первичный
-							if (!bAction) { // cancel
-								// отмена -  выходим
-								return Promise.resolve({ bNeedNewRequest: false });
+							return Promise.resolve({ bNeedNewRequest: false });
 
-							} else {
-								//  сохраняем  заявку
-								return Promise.resolve({ bNeedNewRequest: true });
-							}
-
-						} else { // повторный
-							if (!bAction) {
-								//  отмена - просто выходим
-								return Promise.resolve({ bNeedNewRequest: false });
-
-							} else {
-								// изменяем флаг1 и сохраняем заявку 
-								return new Promise(function (resolve, reject) {
-									this.oODataModel.callFunction("/UpdateFlag1", {
-										urlParameters: {
-											EmployeeID: sEmployeeID,
-											Begda: oStartDate,
-											Endda: oEndDate
-										},
-										method: "GET",
-										success: function (response) {
-											//if (response.UpdateFlag1.ZzOkflag1) {
-											// заново кидаем запрос после изменения флаг1
-											resolve({ bNeedNewRequest: true });
-											//}
-										}.bind(this),
-										error: function (error) {
-											//utils.navTo.call(this, "overview");
-											reject(error);
-										}.bind(this)
-									});
-								}.bind(this));
-							}
+						} else { // повторный							
+							return Promise.resolve({ bNeedNewRequest: false });
 						}
 					}.bind(this))
 					.then(function ({ bNeedNewRequest }) {
@@ -452,6 +419,7 @@ sap.ui.define([
 							this._sendRequest(bNeedNewRequest); //  с признаком Повторно
 						} else {
 							utils.navTo.call(this, "overview");
+							//this.oODataModel.refresh();
 						}
 
 					}.bind(this))
@@ -550,15 +518,10 @@ sap.ui.define([
 				return new Promise(function (resolve) {
 					sap.m.MessageBox.confirm(
 						oMessage.message, {
-						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+						actions: [sap.m.MessageBox.Action.OK],
 						styleClass: bCompact ? "sapUiSizeCompact" : "",
 						onClose: function (sAction) {
-
-							if (sAction === 'CANCEL') {
-								resolve({ bAction: false, bFindRepeatAdvance });
-							} else {
-								resolve({ bAction: true, bFindRepeatAdvance });
-							}
+							resolve({ bAction: true, bFindRepeatAdvance });
 						}
 					}
 					);
