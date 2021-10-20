@@ -63,6 +63,9 @@
 				},
 				"hcm.fab.lib.common": {
 					"lazy": false
+				},
+				"ZHR0351_CONCUR": {
+					"lazy": false
 				}
 			}
 		},
