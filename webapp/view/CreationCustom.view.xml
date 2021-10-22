@@ -186,7 +186,7 @@
 		</semantic:messagesIndicator>
 		<semantic:saveAction>
 			<semantic:SaveAction id="saveButton" enabled="{create>/saveButtonEnabled}" press="onSendRequest"
-				visible="{= ${create>/sEditMode} !== 'DELETE'}"/>
+				visible="{= ${create>/sEditMode} !== 'DELETE' &amp;&amp; ${create>/bUnavailable}}"/>
 		</semantic:saveAction>
 		<semantic:mainAction>
 			<semantic:MainAction id="deleteButton" text="{i18n>deleteActionText}" enabled="{create>/saveButtonEnabled}" press="onSendRequest"

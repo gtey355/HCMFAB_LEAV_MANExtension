@@ -805,6 +805,203 @@ sap.ui.define([
 			}.bind(this));
 		},
 
+		_callCalcLeaveDaysFunctionImport: function (oParams) {
+			
+			return new Promise(function (fnResolve, fnReject) {
+				this.oODataModel.callFunction("/ZCalculateLeaveSpan", {
+					method: "GET",
+					urlParameters: oParams,
+					success: function (oResult) {
+						debugger;
+						oResult.CalculateLeaveSpan = oResult.ZCalculateLeaveSpan; // save old naming
+						//  Create button hided
+						this.oCreateModel.setProperty("/bUnavailable", !!oResult.ZCalculateLeaveSpan.TimeUnitText.length); 
+						fnResolve(oResult);
+					}.bind(this),
+					error: function (oError) {
+						fnReject(oError);
+					}
+				});
+			}.bind(this));
+		},
+		//Update the calculation of potentially used days on basis of the UI input
+		_updateCalcLeaveDays: function (bIsHourTriggered) {
+			
+			var sCurrentLeaveRequestPath = this.getView().getBindingContext().getPath(),
+				sEditMode = this.oCreateModel.getProperty("/sEditMode"),
+				oRangeStartDate = this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/StartDate"),
+				oRangeEndDate = this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/EndDate"),
+				sAbsenceType = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().AbsenceTypeCode,
+				oDateFormat = DateFormat.getDateTimeInstance({
+					pattern: "yyyyMMdd",
+					UTC: true //MELN2652941
+				});
+
+			if (!oRangeStartDate || !formatter.isGroupEnabled(oRangeStartDate, sAbsenceType)) {
+				return;
+			}
+			
+			var sDateStartFormatted = null;
+			var sDateEndFormatted = null;
+			
+			if(this._bCheckLeaveSpanDateIsEdmTime){
+				sDateStartFormatted = oRangeStartDate;
+				sDateEndFormatted = oRangeEndDate;
+			} else {
+				sDateStartFormatted = oDateFormat.format(oRangeStartDate);
+				sDateEndFormatted = oDateFormat.format(oRangeEndDate);
+			}
+
+			this.oCreateModel.setProperty("/usedWorkingTime", this.getResourceBundle().getText("durationCalculation"));
+
+			var sStartTime = null,
+				sEndTime = null;
+			//use Start/End-Time with default value if multidays are available
+			if (this.oCreateModel.getProperty("/multiOrSingleDayRadioGroupIndex") === 0) {
+				sStartTime = "";
+				sEndTime = "";
+			} else {
+				//use Start/End-Time from the available model or (if initial) go with default value
+				sStartTime = this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/StartTime");
+				if (!sStartTime) {
+					sStartTime = "";
+				}
+				sEndTime = this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/EndTime");
+				if (!sEndTime) {
+					sEndTime = "";
+				}
+			}
+
+			var sInputHours = this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/PlannedWorkingHours");
+			//Check whether hours are within one calendar day 
+			if (this.oCreateModel.getProperty("/multiOrSingleDayRadioGroupIndex") === 0 || !sInputHours || sInputHours <= 0 ||
+				sInputHours > 24 || !bIsHourTriggered) {
+				sInputHours = "0.0";
+			}
+
+			var sStatusId = this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/StatusID");
+			if (!sStatusId) {
+				sStatusId = "";
+			}
+
+			this._callCalcLeaveDaysFunctionImport({
+					AbsenceTypeCode: sAbsenceType,
+					EmployeeID: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID,
+					InfoType: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().InfoType,
+					StartDate: sDateStartFormatted,
+					EndDate: sDateEndFormatted,
+					BeginTime: sStartTime,
+					EndTime: sEndTime,
+					RequestID: sEditMode !== "CREATE" ? this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/RequestID") : "",
+					InputHours: sInputHours,
+					StatusID: sStatusId,
+					LeaveKey: sEditMode !== "CREATE" ? this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/LeaveKey") : ""
+				})
+				.then(function (oSuccess) {
+						if (!oSuccess) {
+							this.oCreateModel.setProperty("/usedWorkingTime", null);
+							this._closeBusyDialog();
+							return;
+						}
+
+						//if a save request is already on its way, we do not update the odata model
+						//from the function import as this might lead to undefined odata model behaviour
+						if (this.oCreateModel.getProperty("/isSaveRequestPending")) {
+							return;
+						}
+						// Updated Addtional Fields
+						var aAdditionalFields = this.oCreateModel.getProperty("/AdditionalFields"),
+							bUpdateAdditionalFields = false;
+						aAdditionalFields.forEach(function (AdditionalField) {
+							switch (AdditionalField.Fieldname) {
+							case "AttAbsDays":
+								AdditionalField.fieldValue = oSuccess.CalculateLeaveSpan.AttAbsDays ? oSuccess.CalculateLeaveSpan.AttAbsDays :
+									AdditionalField.fieldValue;
+								bUpdateAdditionalFields = true;
+								break;
+							case "CaleDays":
+								AdditionalField.fieldValue = oSuccess.CalculateLeaveSpan.CalendarDays ? oSuccess.CalculateLeaveSpan.CalendarDays :
+									AdditionalField.fieldValue;
+								bUpdateAdditionalFields = true;
+								break;
+							case "PayrDays":
+								AdditionalField.fieldValue = oSuccess.CalculateLeaveSpan.QuotaUsed ? oSuccess.CalculateLeaveSpan.QuotaUsed :
+									AdditionalField.fieldValue;
+								bUpdateAdditionalFields = true;
+								break;
+							case "PayrHrs":
+								AdditionalField.fieldValue = oSuccess.CalculateLeaveSpan.PayrollHours ? oSuccess.CalculateLeaveSpan.PayrollHours :
+									AdditionalField.fieldValue;
+								bUpdateAdditionalFields = true;
+								break;
+							default:
+								break;
+							}
+						});
+						if (bUpdateAdditionalFields) {
+							this._updateChangeRelevantLocalModelProperty("AdditionalFields", aAdditionalFields);
+							this.oCreateModel.setProperty("/AdditionalFields", aAdditionalFields);
+						}
+						//duration
+						debugger;
+						this.oCreateModel.setProperty("/usedWorkingTime", parseFloat(oSuccess.CalculateLeaveSpan.QuotaUsed));
+						//time unit
+						this.oCreateModel.setProperty("/usedWorkingTimeUnit", oSuccess.CalculateLeaveSpan.TimeUnitText);
+
+						//Process hour based logic for start/end/hours value only in case of single day seletion
+						if (this.oCreateModel.getProperty("/multiOrSingleDayRadioGroupIndex") === 1) {
+							var inputHoursValue = 0;
+							if (this.oCreateModel.getProperty("/showInputHours")) {
+								if (this.getModel("global").getProperty("/bShowIndustryHours")) {
+									inputHoursValue = this._getDecimalHoursFromInputControl();
+								} else {
+									inputHoursValue = this._getDecimalHoursFromTimepicker();
+								}
+							}
+							// Manage setting of start/end time in case of input hours are entered
+							if (bIsHourTriggered && inputHoursValue !== 0) {
+								//Proceed only in case of visible start time picker
+								if (this.byId("startTimePick").getVisible()) {
+									if (oSuccess.CalculateLeaveSpan.BeginTime) {
+										this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/StartTime", oSuccess.CalculateLeaveSpan.BeginTime);
+									} else {
+										// Fallback: Set initial start time if no value came back
+										this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/StartTime", "");
+									}
+								}
+								//Proceed only in case of visible end time picker
+								if (this.byId("endTimePick").getVisible()) {
+									if (oSuccess.CalculateLeaveSpan.EndTime) {
+										this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/EndTime", oSuccess.CalculateLeaveSpan.EndTime);
+									} else {
+										// Fallback: Set initial start time if no value came back
+										this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/EndTime", "");
+									}
+								}
+							}
+							//proceed only in case of visible hour field
+							if (this.oCreateModel.getProperty("/showInputHours") && oSuccess.CalculateLeaveSpan.AttabsHours && oSuccess.CalculateLeaveSpan.AttabsHours !==
+								"0.00" &&
+								this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/PlannedWorkingHours") !== oSuccess.CalculateLeaveSpan.AttabsHours) {
+								this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/PlannedWorkingHours", oSuccess.CalculateLeaveSpan.AttabsHours);
+							}
+						}
+
+						this._closeBusyDialog();
+					}.bind(this),
+
+					function (oError) {
+						jQuery.sap.log.error(
+							"An error occurred while calling CalcLeaveDays function import",
+							oError
+						);
+						this.oCreateModel.setProperty("/usedWorkingTime", null);
+						this.oCreateModel.setProperty("/usedWorkingTimeUnit", null);
+
+						this._closeBusyDialog();
+					}.bind(this));
+		},
+
 		_updateAvailableQuota: function () {
 			this.oCreateModel.setProperty("/BalanceAvailableQuantityText", this.getResourceBundle().getText("availabilityCalculation"));
 			this._showBusyDialog();

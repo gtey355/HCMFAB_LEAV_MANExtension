@@ -1,3 +1,6 @@
+(function () {
+	jQuery.sap.registerModulePath("hcm.fab.lib.common", "/sap/bc/ui5_ui5/sap/hcmfab_common/");
+}());
 sap.ui.loader.config({
 	paths: {
 	  "ZHR0351_CONCUR": "/sap/bc/ui5_ui5/sap/ZHR0351_CONCUR",
