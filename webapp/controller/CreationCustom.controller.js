@@ -723,28 +723,6 @@ sap.ui.define([
 					// and set SAVE button state accordingly
 					this._revalidateSaveButtonStatus();
 
-					//vperebatov
-					// проверка на кол-во отработанных месяцев
-
-					var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
-					new Promise(function (resolve, reject) {
-						this.oODataModel.callFunction("/ZGetHire", {
-							urlParameters: {
-								EmployeeID: sEmployeeID
-							},
-							method: "GET",
-							success: function (response) {
-								resolve(response);
-							},
-							error: function (error) {
-								reject(error);
-							}
-						});
-					}.bind(this)).then(function (oData) {
-
-						this.oCreateModel.setProperty("/bHire", oData.ZGetHire.ZzHire === 'X');
-					}.bind(this));
-
 
 					// проверка на совместителя
 					new Promise(function (resolve, reject) {
