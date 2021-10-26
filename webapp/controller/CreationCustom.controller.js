@@ -195,11 +195,11 @@ sap.ui.define([
 			}, undefined, false);
 		},
 
-		onSendRequest: function () {
+		onSendRequest: function (oEvent) {
 
-			//this._sendRequest();
+			this._sendRequest();
 
-			var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
+			/* var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
 			var sRootPath = jQuery.sap.getModulePath("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension");
 			var i18nModel = new sap.ui.model.resource.ResourceModel({
 				bundleUrl: [sRootPath, "i18n/i18n_custom.properties"].join("/")
@@ -221,7 +221,7 @@ sap.ui.define([
 			}).then(function () {
 
 				this._sendRequest();
-			}.bind(this));
+			}.bind(this)); */
 
 		},
 
@@ -381,7 +381,8 @@ sap.ui.define([
 					}.bind(this))
 					.then(function ({ bNeedNewRequest }) {
 						debugger;
-						// удаляем старые ошибки
+						this._navBack();
+						/* // удаляем старые ошибки
 						this.oErrorHandler.pushError(oError);
 						this.oErrorHandler.displayErrorPopup();
 						this.oErrorHandler.setShowErrors("immediately");
@@ -389,9 +390,10 @@ sap.ui.define([
 						if (bNeedNewRequest) {
 							this._sendRequest(bNeedNewRequest); //  с признаком Повторно
 						} else {
-							utils.navTo.call(this, "overview");
+							this._navBack();
+							//utils.navTo.call(this, "overview");
 							//this.oODataModel.refresh();
-						}
+						} */
 
 					}.bind(this))
 					.catch(function (oErr) {
