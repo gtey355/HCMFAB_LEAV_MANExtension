@@ -725,7 +725,8 @@ sap.ui.define([
 					// and set SAVE button state accordingly
 					this._revalidateSaveButtonStatus();
 
-
+					debugger;
+					var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
 					// проверка на совместителя
 					new Promise(function (resolve, reject) {
 						this.oODataModel.callFunction("/checkCE", {
@@ -786,7 +787,7 @@ sap.ui.define([
 		},
 
 		_callCalcLeaveDaysFunctionImport: function (oParams) {
-			
+
 			return new Promise(function (fnResolve, fnReject) {
 				this.oODataModel.callFunction("/ZCalculateLeaveSpan", {
 					method: "GET",
@@ -795,7 +796,7 @@ sap.ui.define([
 						debugger;
 						oResult.CalculateLeaveSpan = oResult.ZCalculateLeaveSpan; // save old naming
 						//  Create button hided
-						this.oCreateModel.setProperty("/bUnavailable", !!oResult.ZCalculateLeaveSpan.TimeUnitText.length); 
+						this.oCreateModel.setProperty("/bUnavailable", !!oResult.ZCalculateLeaveSpan.TimeUnitText.length);
 						fnResolve(oResult);
 					}.bind(this),
 					error: function (oError) {
@@ -806,7 +807,7 @@ sap.ui.define([
 		},
 		//Update the calculation of potentially used days on basis of the UI input
 		_updateCalcLeaveDays: function (bIsHourTriggered) {
-			
+
 			var sCurrentLeaveRequestPath = this.getView().getBindingContext().getPath(),
 				sEditMode = this.oCreateModel.getProperty("/sEditMode"),
 				oRangeStartDate = this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/StartDate"),
@@ -820,11 +821,11 @@ sap.ui.define([
 			if (!oRangeStartDate || !formatter.isGroupEnabled(oRangeStartDate, sAbsenceType)) {
 				return;
 			}
-			
+
 			var sDateStartFormatted = null;
 			var sDateEndFormatted = null;
-			
-			if(this._bCheckLeaveSpanDateIsEdmTime){
+
+			if (this._bCheckLeaveSpanDateIsEdmTime) {
 				sDateStartFormatted = oRangeStartDate;
 				sDateEndFormatted = oRangeEndDate;
 			} else {
@@ -865,35 +866,35 @@ sap.ui.define([
 			}
 
 			this._callCalcLeaveDaysFunctionImport({
-					AbsenceTypeCode: sAbsenceType,
-					EmployeeID: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID,
-					InfoType: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().InfoType,
-					StartDate: sDateStartFormatted,
-					EndDate: sDateEndFormatted,
-					BeginTime: sStartTime,
-					EndTime: sEndTime,
-					RequestID: sEditMode !== "CREATE" ? this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/RequestID") : "",
-					InputHours: sInputHours,
-					StatusID: sStatusId,
-					LeaveKey: sEditMode !== "CREATE" ? this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/LeaveKey") : ""
-				})
+				AbsenceTypeCode: sAbsenceType,
+				EmployeeID: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID,
+				InfoType: this.getSelectedAbsenceTypeControl().getBindingContext().getObject().InfoType,
+				StartDate: sDateStartFormatted,
+				EndDate: sDateEndFormatted,
+				BeginTime: sStartTime,
+				EndTime: sEndTime,
+				RequestID: sEditMode !== "CREATE" ? this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/RequestID") : "",
+				InputHours: sInputHours,
+				StatusID: sStatusId,
+				LeaveKey: sEditMode !== "CREATE" ? this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/LeaveKey") : ""
+			})
 				.then(function (oSuccess) {
-						if (!oSuccess) {
-							this.oCreateModel.setProperty("/usedWorkingTime", null);
-							this._closeBusyDialog();
-							return;
-						}
+					if (!oSuccess) {
+						this.oCreateModel.setProperty("/usedWorkingTime", null);
+						this._closeBusyDialog();
+						return;
+					}
 
-						//if a save request is already on its way, we do not update the odata model
-						//from the function import as this might lead to undefined odata model behaviour
-						if (this.oCreateModel.getProperty("/isSaveRequestPending")) {
-							return;
-						}
-						// Updated Addtional Fields
-						var aAdditionalFields = this.oCreateModel.getProperty("/AdditionalFields"),
-							bUpdateAdditionalFields = false;
-						aAdditionalFields.forEach(function (AdditionalField) {
-							switch (AdditionalField.Fieldname) {
+					//if a save request is already on its way, we do not update the odata model
+					//from the function import as this might lead to undefined odata model behaviour
+					if (this.oCreateModel.getProperty("/isSaveRequestPending")) {
+						return;
+					}
+					// Updated Addtional Fields
+					var aAdditionalFields = this.oCreateModel.getProperty("/AdditionalFields"),
+						bUpdateAdditionalFields = false;
+					aAdditionalFields.forEach(function (AdditionalField) {
+						switch (AdditionalField.Fieldname) {
 							case "AttAbsDays":
 								AdditionalField.fieldValue = oSuccess.CalculateLeaveSpan.AttAbsDays ? oSuccess.CalculateLeaveSpan.AttAbsDays :
 									AdditionalField.fieldValue;
@@ -916,59 +917,59 @@ sap.ui.define([
 								break;
 							default:
 								break;
-							}
-						});
-						if (bUpdateAdditionalFields) {
-							this._updateChangeRelevantLocalModelProperty("AdditionalFields", aAdditionalFields);
-							this.oCreateModel.setProperty("/AdditionalFields", aAdditionalFields);
 						}
-						//duration
-						debugger;
-						this.oCreateModel.setProperty("/usedWorkingTime", parseFloat(oSuccess.CalculateLeaveSpan.QuotaUsed));
-						//time unit
-						this.oCreateModel.setProperty("/usedWorkingTimeUnit", oSuccess.CalculateLeaveSpan.TimeUnitText);
+					});
+					if (bUpdateAdditionalFields) {
+						this._updateChangeRelevantLocalModelProperty("AdditionalFields", aAdditionalFields);
+						this.oCreateModel.setProperty("/AdditionalFields", aAdditionalFields);
+					}
+					//duration
+					debugger;
+					this.oCreateModel.setProperty("/usedWorkingTime", parseFloat(oSuccess.CalculateLeaveSpan.QuotaUsed));
+					//time unit
+					this.oCreateModel.setProperty("/usedWorkingTimeUnit", oSuccess.CalculateLeaveSpan.TimeUnitText);
 
-						//Process hour based logic for start/end/hours value only in case of single day seletion
-						if (this.oCreateModel.getProperty("/multiOrSingleDayRadioGroupIndex") === 1) {
-							var inputHoursValue = 0;
-							if (this.oCreateModel.getProperty("/showInputHours")) {
-								if (this.getModel("global").getProperty("/bShowIndustryHours")) {
-									inputHoursValue = this._getDecimalHoursFromInputControl();
+					//Process hour based logic for start/end/hours value only in case of single day seletion
+					if (this.oCreateModel.getProperty("/multiOrSingleDayRadioGroupIndex") === 1) {
+						var inputHoursValue = 0;
+						if (this.oCreateModel.getProperty("/showInputHours")) {
+							if (this.getModel("global").getProperty("/bShowIndustryHours")) {
+								inputHoursValue = this._getDecimalHoursFromInputControl();
+							} else {
+								inputHoursValue = this._getDecimalHoursFromTimepicker();
+							}
+						}
+						// Manage setting of start/end time in case of input hours are entered
+						if (bIsHourTriggered && inputHoursValue !== 0) {
+							//Proceed only in case of visible start time picker
+							if (this.byId("startTimePick").getVisible()) {
+								if (oSuccess.CalculateLeaveSpan.BeginTime) {
+									this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/StartTime", oSuccess.CalculateLeaveSpan.BeginTime);
 								} else {
-									inputHoursValue = this._getDecimalHoursFromTimepicker();
+									// Fallback: Set initial start time if no value came back
+									this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/StartTime", "");
 								}
 							}
-							// Manage setting of start/end time in case of input hours are entered
-							if (bIsHourTriggered && inputHoursValue !== 0) {
-								//Proceed only in case of visible start time picker
-								if (this.byId("startTimePick").getVisible()) {
-									if (oSuccess.CalculateLeaveSpan.BeginTime) {
-										this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/StartTime", oSuccess.CalculateLeaveSpan.BeginTime);
-									} else {
-										// Fallback: Set initial start time if no value came back
-										this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/StartTime", "");
-									}
+							//Proceed only in case of visible end time picker
+							if (this.byId("endTimePick").getVisible()) {
+								if (oSuccess.CalculateLeaveSpan.EndTime) {
+									this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/EndTime", oSuccess.CalculateLeaveSpan.EndTime);
+								} else {
+									// Fallback: Set initial start time if no value came back
+									this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/EndTime", "");
 								}
-								//Proceed only in case of visible end time picker
-								if (this.byId("endTimePick").getVisible()) {
-									if (oSuccess.CalculateLeaveSpan.EndTime) {
-										this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/EndTime", oSuccess.CalculateLeaveSpan.EndTime);
-									} else {
-										// Fallback: Set initial start time if no value came back
-										this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/EndTime", "");
-									}
-								}
-							}
-							//proceed only in case of visible hour field
-							if (this.oCreateModel.getProperty("/showInputHours") && oSuccess.CalculateLeaveSpan.AttabsHours && oSuccess.CalculateLeaveSpan.AttabsHours !==
-								"0.00" &&
-								this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/PlannedWorkingHours") !== oSuccess.CalculateLeaveSpan.AttabsHours) {
-								this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/PlannedWorkingHours", oSuccess.CalculateLeaveSpan.AttabsHours);
 							}
 						}
+						//proceed only in case of visible hour field
+						if (this.oCreateModel.getProperty("/showInputHours") && oSuccess.CalculateLeaveSpan.AttabsHours && oSuccess.CalculateLeaveSpan.AttabsHours !==
+							"0.00" &&
+							this.oODataModel.getProperty(sCurrentLeaveRequestPath + "/PlannedWorkingHours") !== oSuccess.CalculateLeaveSpan.AttabsHours) {
+							this.oODataModel.setProperty(sCurrentLeaveRequestPath + "/PlannedWorkingHours", oSuccess.CalculateLeaveSpan.AttabsHours);
+						}
+					}
 
-						this._closeBusyDialog();
-					}.bind(this),
+					this._closeBusyDialog();
+				}.bind(this),
 
 					function (oError) {
 						jQuery.sap.log.error(
