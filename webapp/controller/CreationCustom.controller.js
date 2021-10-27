@@ -381,30 +381,34 @@ sap.ui.define([
 					}.bind(this))
 					.then(function ({ bNeedNewRequest }) {
 						debugger;
-						this._navBack();
-						/* // удаляем старые ошибки
-						this.oErrorHandler.pushError(oError);
-						this.oErrorHandler.displayErrorPopup();
-						this.oErrorHandler.setShowErrors("immediately");
-						// перезапуск запроса если необходимо
-						if (bNeedNewRequest) {
-							this._sendRequest(bNeedNewRequest); //  с признаком Повторно
-						} else {
-							this._navBack();
-							//utils.navTo.call(this, "overview");
-							//this.oODataModel.refresh();
-						} */
 
+						// this is _showSuccessStatusMessage w/o promise is returned
+						utils.navTo.call(this, "overview");
+						this.oCreateModel.setProperty("/busy", false);
+						//send event to refresh the overview page
+						this.getOwnerComponent().getEventBus().publish("hcm.fab.myleaverequest", "invalidateoverview", {
+							// Show toast after the navigation to the overview page
+							fnAfterNavigate: function () {
+								if (oParams.showSuccess) {
+									jQuery.sap.delayedCall(400, this, function () {
+										MessageToast.show(this.getResourceBundle().getText("createdSuccessfully"));
+									});
+								}
+							}.bind(this)
+						});
+						this.initLocalModel();
+						this.getView().setBindingContext(null);
+						this._doAttachmentCleanup();
+
+					}.bind(this))
+					.then(function () {
+						debugger;
 					}.bind(this))
 					.catch(function (oErr) {
 
 					}.bind(this))
 					.finally(function () {
-						debugger;
-						// show one or more error messages
-						//if (!bNeedNewRequest) {
 
-						//}
 					}.bind(this));
 
 			};
@@ -725,7 +729,7 @@ sap.ui.define([
 					// and set SAVE button state accordingly
 					this._revalidateSaveButtonStatus();
 
-					debugger;
+					//debugger;
 					var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
 					// проверка на совместителя
 					new Promise(function (resolve, reject) {

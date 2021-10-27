@@ -196,7 +196,21 @@ sap.ui.controller(
         target: { shellHash: "#Shell-home" },
       });
 
-    }
+    },
+
+    onInvalidateOverview: function (sChannelId, sEventId, oData) {
+      debugger;
+			// leave request changed -> update change date in global model for teamcalendar refresh
+			this.getModel("global").setProperty("/lastLeaveRequestChangeDate", new Date());
+			// execute the afterNavigate function (if present)
+			if (oData.fnAfterNavigate) {
+				oData.fnAfterNavigate();
+			}
+
+			this._oDataUtil.refresh();
+			this._refreshAbsences();
+			this._refreshEntitlements();
+		},
 
   }
 );
