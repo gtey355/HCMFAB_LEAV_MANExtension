@@ -24,10 +24,10 @@ sap.ui.controller(
       // set initial values
       var oOverviewModel = this.getView().getModel("overview");
       oOverviewModel.setProperty("/limitStartDate", new Date());
+      oOverviewModel.setProperty("/limCount", 0);
     },
 
     _readLimits: function (sEmployeeId) {
-      //debugger;
 
       let oLimitStartDate = this.getView()
         .getModel("overview")
@@ -185,7 +185,7 @@ sap.ui.controller(
     },
 
     _goBack: function () {
-      //debugger;
+     
       var oHistory = sap.ui.core.routing.History.getInstance();
       var sPreviousHash = oHistory.getPreviousHash();
 
@@ -199,7 +199,7 @@ sap.ui.controller(
     },
 
     onInvalidateOverview: function (sChannelId, sEventId, oData) {
-      debugger;
+  
 			// leave request changed -> update change date in global model for teamcalendar refresh
 			this.getModel("global").setProperty("/lastLeaveRequestChangeDate", new Date());
 			// execute the afterNavigate function (if present)
@@ -211,6 +211,11 @@ sap.ui.controller(
 			this._refreshAbsences();
 			this._refreshEntitlements();
 		},
+
+    onUpdateFinishedLimits: function (oEvent) {
+		
+			this._oOverviewModel.setProperty("/limCount", oEvent.getParameter("total"));
+		}
 
   }
 );

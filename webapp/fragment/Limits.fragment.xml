@@ -7,7 +7,7 @@
 		<Table id="limitTable" items="{}" updateFinished="onUpdateFinishedLimits" growing="false" inset="false" growingScrollToLoad="false" busyIndicatorDelay="0">
 			<headerToolbar>
 				<OverflowToolbar>
-					<Title id="limitCount" text="{path: 'overview>/entCount', formatter: '.formatter.itemCountFormatter'}" titleStyle="Auto" level="Auto" visible="{= !${device>/system/phone}}"/>
+					<Title id="limitCount" text="{path: 'overview>/limCount', formatter: '.formatter.itemCountFormatter'}" titleStyle="Auto" level="Auto" visible="{= !${device>/system/phone}}"/>
 					<ToolbarSpacer/>
 					<Label text="{i18n>showOn}" visible="{= !${device>/system/phone}}"/>
 					<DatePicker id="limitDatePicker" value="{ path: 'overview>/limitStartDate', type:'sap.ui.model.type.Date', formatOptions: { style: 'medium', strictParsing: true , UTC: false } }" change="onLimitDateChanged" width="10rem" tooltip="{i18n>showLimitFrom}" ariaLabelledBy="limitDatePickerAccLabel"/>
