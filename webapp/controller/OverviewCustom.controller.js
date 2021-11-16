@@ -92,10 +92,13 @@ sap.ui.controller(
     },
 
     onLimitDateChanged: function (oEvent) {
+      debugger;
+
       var oDatePicker = oEvent.getSource();
-      var iSelectedDate = +oDatePicker.getDateValue();
-      var iNow = +new Date();
-      if (iSelectedDate >= iNow) {
+      var iSelectedDate = oDatePicker.getDateValue();
+      var iNow = new Date();
+      var iNowForCompare = iNow.setHours(0,0,0,0);
+      if (iSelectedDate >= iNowForCompare) {
         this._oOverviewModel.setProperty(
           "/limitStartDate",
           oDatePicker.getDateValue()
