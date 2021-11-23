@@ -199,30 +199,6 @@ sap.ui.define([
 
 			this._sendRequest();
 
-			/* var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
-			var sRootPath = jQuery.sap.getModulePath("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension");
-			var i18nModel = new sap.ui.model.resource.ResourceModel({
-				bundleUrl: [sRootPath, "i18n/i18n_custom.properties"].join("/")
-			});
-			var sMsgText = i18nModel.getResourceBundle().getText("msgPEP");
-
-			new Promise(function (resolve, reject) {
-				sap.m.MessageBox.confirm(
-					sMsgText, {
-					actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
-					styleClass: bCompact ? "sapUiSizeCompact" : "",
-					onClose: function (sAction) {
-						if (sAction === 'OK') {
-							resolve(true);
-						}
-					}
-				}
-				);
-			}).then(function () {
-
-				this._sendRequest();
-			}.bind(this)); */
-
 		},
 
 
@@ -321,6 +297,15 @@ sap.ui.define([
 			*/
 			var fnError = function (oError) {
 				debugger;
+
+				let oMessageManager = this.oErrorHandler._oMessageManager;
+
+				var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
+				var sRootPath = jQuery.sap.getModulePath("hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension");
+				var i18nModel = new sap.ui.model.resource.ResourceModel({
+					bundleUrl: [sRootPath, "i18n/i18n_custom.properties"].join("/")
+				});
+				var sMsgText = i18nModel.getResourceBundle().getText("msgPEP");
 				this.oCreateModel.setProperty("/busy", false);
 				this.oCreateModel.setProperty("/uploadPercentage", 0);
 
@@ -354,62 +339,46 @@ sap.ui.define([
 					}
 				}
 
+				// обработка ошибок из одата сервиса
+				let oParam = {};
+				let { bSomeMessage, bNoMessages, bAdvance, bSimulationResult, oMessage } = this._checkServiceMessages(oParam);
 
-				// vp 26082021 
-				// проверяем на авансы	
-				//debugger;
-				this._checkAdvanceMessage()
-					.then(function ({ bSomeMessage, bNoMessages, bAction, bFindRepeatAdvance }) {
-						//debugger;
-						if (bNoMessages || bSomeMessage) { // просто выходим
-							//debugger;
-							//return new Promise.resolve();
-							return;
-						}
+				if (bAdvance) {
+					sap.m.MessageBox.confirm(
+						oMessage.message, {
+						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+						styleClass: bCompact ? "sapUiSizeCompact" : "",
+						onClose: function (sAction) {
+							if (sAction === 'OK') {
+								this._sendRequest(true);
+							}
+						}.bind(this)
+					}
+					);
 
-						var sEmployeeID = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().EmployeeID;
-						var oDateRange = this.getView().byId("dateRange");
-						var oStartDate = oDateRange.getDateValue();
-						var oEndDate = oDateRange.getSecondDateValue();
-						var sAbsType = this.getSelectedAbsenceTypeControl().getBindingContext().getObject().AbsenceTypeCode;
-						if (!bFindRepeatAdvance) { // первичный
-							return Promise.resolve({ bNeedNewRequest: false });
+					return;
+				}
+				if (bNoMessages || bSomeMessage) { //  просто остаемся на экране заявки
+					return;
+				}
+				// 
+				if (bSimulationResult) { // выводим пэп
+					oMessageManager.removeAllMessages();
+					this.oErrorHandler._aErrors = [];
 
-						} else { // повторный							
-							return Promise.resolve({ bNeedNewRequest: false });
-						}
-					}.bind(this))
-					.then(function ({ bNeedNewRequest }) {
-						debugger;
+					sap.m.MessageBox.confirm(
+						sMsgText, {
+						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+						styleClass: bCompact ? "sapUiSizeCompact" : "",
+						onClose: function (sAction) {
+							if (sAction === 'OK') {
+								this._sendRequest(true);
+							}
+						}.bind(this)
+					}
+					);
 
-						// this is _showSuccessStatusMessage w/o promise is returned
-						utils.navTo.call(this, "overview");
-						this.oCreateModel.setProperty("/busy", false);
-						//send event to refresh the overview page
-						this.getOwnerComponent().getEventBus().publish("hcm.fab.myleaverequest", "invalidateoverview", {
-							// Show toast after the navigation to the overview page
-							fnAfterNavigate: function () {
-								if (oParams.showSuccess) {
-									jQuery.sap.delayedCall(400, this, function () {
-										MessageToast.show(this.getResourceBundle().getText("createdSuccessfully"));
-									});
-								}
-							}.bind(this)
-						});
-						this.initLocalModel();
-						this.getView().setBindingContext(null);
-						this._doAttachmentCleanup();
-
-					}.bind(this))
-					.then(function () {
-						debugger;
-					}.bind(this))
-					.catch(function (oErr) {
-
-					}.bind(this))
-					.finally(function () {
-
-					}.bind(this));
+				}
 
 			};
 
@@ -452,67 +421,29 @@ sap.ui.define([
 
 		},
 
-		_checkAdvanceMessage: function () {
+		_checkServiceMessages: function (oParam) {
 
-			debugger;
-
+			let bSomeMessage, bNoMessages, bAdvance, bSimulationResult, oMessage;
 			let oMessageManager = this.oErrorHandler._oMessageManager;
-			var bFindRepeatAdvance = false;
-			var bNoMessages = false;
-
-
 			let aMessages = oMessageManager.getMessageModel().getData();
 			if (!aMessages.length) {
 				bNoMessages = true;
-				return Promise.resolve({ bNoMessages });
 			}
-			let bSomeMessage = aMessages.length > 1 ? true : false;
+			bSomeMessage = aMessages.length > 1 ? true : false;
+			oMessage = aMessages.find(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/006') : undefined);
+			oMessage = oMessage ? oMessage : aMessages.find(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/005') : undefined);
 
-			let oMessage;
-			// search ZHR0043_MSG/006
-			let oAbvanceMessage = aMessages.find(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/006') : undefined);
-			// search ZHR0043_MSG/005
-			let oRepeatAbvanceMessage = aMessages.find(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/005') : undefined);
-			if (oAbvanceMessage) {
-				oMessage = oAbvanceMessage;
-			} else if (oRepeatAbvanceMessage) {
-				bFindRepeatAdvance = true;
-				oMessage = oRepeatAbvanceMessage;
-			} else {
-				return Promise.resolve({ bNoMessages: true });
-			}
+			bAdvance = oMessage ? true : false;
+			// search ZHR0043_MSG/008 - успешное моделирование без ошибок
+			bSimulationResult = aMessages.findIndex(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/008') : false) > -1 ? true : false;
 
-			// если сообщений несколько, меняем нашу ошибку на инфо и идем на след шаг
-			// иначе наше сообщение будет выводится как диалог, а оригинальное - удаляем
-			if (bSomeMessage) {
-				oMessage.type = 'Information';
-				return Promise.resolve({ bSomeMessage });
-			} else {
-				oMessageManager.removeAllMessages();
-				this.oErrorHandler._aErrors = [];
-				var bCompact = !!this.getView().$().closest(".sapUiSizeCompact").length;
 
-				return new Promise(function (resolve) {
-					sap.m.MessageBox.confirm(
-						oMessage.message, {
-						actions: [sap.m.MessageBox.Action.OK],
-						styleClass: bCompact ? "sapUiSizeCompact" : "",
-						onClose: function (sAction) {
-							resolve({ bAction: true, bFindRepeatAdvance });
-						}
-					}
-					);
-				}.bind(this));
-
-			}
-
+			return { bSomeMessage, bNoMessages, bAdvance, bSimulationResult, oMessage };
 		},
 
+	
 
 		onAbsenceTypeChange: function (oEvent) {
-
-
-
 			var oAbsenceTypeContext,
 				oAbsenceTypeSelectedItem = oEvent.getParameter("selectedItem"),
 				sLeaveRequestContextPath = this.getView().getBindingContext().getPath();
