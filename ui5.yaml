@@ -12,9 +12,15 @@ builder:
     excludes:
       - /test/**
       - /localService/**
-  # customTasks:
-  #   - name: ui5-task-babel
-  #     afterTask: replaceVersion
+  customTasks:
+      - name: ui5-task-transpile
+        afterTask: replaceVersion
+        configuration:
+          debug: true
+          removeConsoleStatements: true
+          transpileAsync: true
+          excludePatterns:
+            - "debug/"
 server:
   customMiddleware:
   - name: fiori-tools-proxy
