@@ -218,7 +218,17 @@ sap.ui.controller(
     onUpdateFinishedLimits: function (oEvent) {
 		
 			this._oOverviewModel.setProperty("/limCount", oEvent.getParameter("total"));
+		},
+
+    _refreshEntitlements: function () {
+			var oEntitlementTable = this.getView().byId("entitlementTable");
+      if (!oEntitlementTable) {
+        return;
+      }
+      var oEntitlementTableBinding = oEntitlementTable.getBinding("items");
+			oEntitlementTableBinding.refresh();
 		}
+  
 
   }
 );

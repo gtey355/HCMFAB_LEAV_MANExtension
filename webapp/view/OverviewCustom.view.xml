@@ -50,6 +50,7 @@
 						type="Warning" showIcon="true" showCloseButton="true"
 						tooltip="{parts:[{path: 'i18n>minDisplayDateTxt'}, {path:'global>/leaveRequestMinDisplayDate', type: 'sap.ui.model.type.Date', formatOptions: { style: 'medium', UTC: false }, constraints: { displayFormat : 'Date' }}], formatter: 'jQuery.sap.formatMessage'}"
 						close="onCloseMinDispMessStrip" class="sapUiSmallMarginTopBottom" visible="{overview>/showMinDisplayStrip}"/>
+	
 					<!--Leave Request Overview Table -->
 					<Table id="leaveRequestTable" fixedLayout="true" inset="false" items="{overview>/leaveRequestTableItems}" itemPress="onItemPressed"
 						busyIndicatorDelay="0" updateFinished="onUpdateFinishedOverview" growing="{= !${device>/system/desktop}}" growingThreshold="15"
