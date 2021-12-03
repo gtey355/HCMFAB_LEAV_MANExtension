@@ -14,10 +14,11 @@ sap.ui.define([
 		});
 		var sUsedWorkingTimePluralExt = i18nModel.getResourceBundle().getText("usedWorkingTimePluralExt");
 		var usedWorkingTimeSingularExt = i18nModel.getResourceBundle().getText("usedWorkingTimeSingularExt");
+		var sNoDeducPossibleExt = i18nModel.getResourceBundle().getText("noDeducPossibleExt");
 
 		//------Note 2607105:Consider non-deductible leave ranges-------
 		if (sNumberUnit === null || sNumberUnit === "") {
-			return this.getResourceBundle().getText("noDeducPossible");
+			return sNoDeducPossibleExt;
 		}
 		//--------------------------------------------------------------
 		if (!sNumberUnit) {
