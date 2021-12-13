@@ -160,7 +160,7 @@ sap.ui.define([
 					case "SENT":
 						return "Type01";
 					case "REJECTED":
-						return "None";
+						return "None"; // hide red color
 					default: //fallback (should not happen)
 						return "Type06";
 				}
