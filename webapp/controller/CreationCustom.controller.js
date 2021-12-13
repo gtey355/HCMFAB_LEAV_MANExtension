@@ -146,6 +146,34 @@ sap.ui.define([
 			});
 			this.getView().setModel(i18nModel, "i18n");
 
+			// 
+			var oButtonPopoverMon = this.getView().byId("createMessagesIndicator");
+			oButtonPopoverMon.addEventDelegate(
+				{
+					onAfterRendering: function () {
+						//debugger;
+						if (!this._oMessagePopover) {
+							this._oMessagePopover = new MessagePopover({
+								items: {
+									path: "message>/",
+									template: new MessagePopoverItem({
+										description: "{message>description}",
+										type: "{message>type}",
+										title: "{message>message}",
+										subtitle: "{message>additionalText}"
+									})
+								}
+							});
+							jQuery.sap.syncStyleClass(this.getOwnerComponent().getContentDensityClass(), this.getView(), this._oMessagePopover);
+							this.getView().addDependent(this._oMessagePopover);
+						}
+						this._oMessagePopover.openBy(oButtonPopoverMon);
+
+					}
+				},
+				this
+			);
+
 		},
 
 		initLocalModel: function () {
@@ -358,7 +386,11 @@ sap.ui.define([
 
 					return;
 				}
-				if (bNoMessages || bSomeMessage) { //  просто остаемся на экране заявки
+				if (bNoMessages) { //  просто остаемся на экране заявки
+					return;
+				}
+				if (bSomeMessage) { //  открываем попап с сообщениями
+
 					return;
 				}
 				// 
@@ -441,7 +473,7 @@ sap.ui.define([
 			return { bSomeMessage, bNoMessages, bAdvance, bSimulationResult, oMessage };
 		},
 
-	
+
 
 		onAbsenceTypeChange: function (oEvent) {
 			var oAbsenceTypeContext,
@@ -859,7 +891,7 @@ sap.ui.define([
 						this.oCreateModel.setProperty("/AdditionalFields", aAdditionalFields);
 					}
 					//duration
-					debugger;
+					//debugger;
 					this.oCreateModel.setProperty("/usedWorkingTime", parseFloat(oSuccess.CalculateLeaveSpan.QuotaUsed));
 					//time unit
 					this.oCreateModel.setProperty("/usedWorkingTimeUnit", oSuccess.CalculateLeaveSpan.TimeUnitText);
