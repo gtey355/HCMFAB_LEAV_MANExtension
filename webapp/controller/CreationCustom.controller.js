@@ -132,7 +132,11 @@ sap.ui.define([
 		 * Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
 		 * @memberOf hcm.fab.myleaverequest.view.Creation
 		 */
+
+
+
 		onInit: function () {
+			debugger;
 
 			// add custom i18n
 			var i18nModel = new sap.ui.model.resource.ResourceModel({
@@ -146,33 +150,21 @@ sap.ui.define([
 			});
 			this.getView().setModel(i18nModel, "i18n");
 
-			// 
-			/* var oButtonPopoverMon = this.getView().byId("createMessagesIndicator");
-			oButtonPopoverMon.addEventDelegate(
-				{
-					onAfterRendering: function () {
-						//debugger;
-						if (!this._oMessagePopover) {
-							this._oMessagePopover = new MessagePopover({
-								items: {
-									path: "message>/",
-									template: new MessagePopoverItem({
-										description: "{message>description}",
-										type: "{message>type}",
-										title: "{message>message}",
-										subtitle: "{message>additionalText}"
-									})
-								}
-							});
-							jQuery.sap.syncStyleClass(this.getOwnerComponent().getContentDensityClass(), this.getView(), this._oMessagePopover);
-							this.getView().addDependent(this._oMessagePopover);
-						}
-						this._oMessagePopover.openBy(oButtonPopoverMon);
 
-					}
-				},
-				this
-			); */
+			formatter.getCalendarTypeFromStatus = function (sStatus) {
+				//debugger;
+				switch (sStatus) {
+					case "POSTED":
+					case "APPROVED":
+						return "Type08";
+					case "SENT":
+						return "Type01";
+					case "REJECTED":
+						return "None";
+					default: //fallback (should not happen)
+						return "Type06";
+				}
+			};
 
 		},
 
