@@ -147,7 +147,7 @@ sap.ui.define([
 			this.getView().setModel(i18nModel, "i18n");
 
 			// 
-			var oButtonPopoverMon = this.getView().byId("createMessagesIndicator");
+			/* var oButtonPopoverMon = this.getView().byId("createMessagesIndicator");
 			oButtonPopoverMon.addEventDelegate(
 				{
 					onAfterRendering: function () {
@@ -172,7 +172,7 @@ sap.ui.define([
 					}
 				},
 				this
-			);
+			); */
 
 		},
 
@@ -390,6 +390,32 @@ sap.ui.define([
 					return;
 				}
 				if (bSomeMessage) { //  открываем попап с сообщениями
+					var oButtonPopover = this.getView().byId("createMessagesIndicator");
+					oButtonPopover.attachEventOnce(
+						{
+							onAfterRendering: function () {
+								//debugger;
+								if (!this._oMessagePopover) {
+									this._oMessagePopover = new MessagePopover({
+										items: {
+											path: "message>/",
+											template: new MessagePopoverItem({
+												description: "{message>description}",
+												type: "{message>type}",
+												title: "{message>message}",
+												subtitle: "{message>additionalText}"
+											})
+										}
+									});
+									jQuery.sap.syncStyleClass(this.getOwnerComponent().getContentDensityClass(), this.getView(), this._oMessagePopover);
+									this.getView().addDependent(this._oMessagePopover);
+								}
+								this._oMessagePopover.openBy(oButtonPopover);
+
+							}
+						},
+						this
+					);
 
 					return;
 				}
