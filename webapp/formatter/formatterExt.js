@@ -67,8 +67,25 @@ sap.ui.define([
 		return sAvailabilityAmount;
 	}
 
+	// Formatting method to set the right status of the list items          
+	function getListItemStatusExt(sStatus,sChangeStatus) {
+		debugger;
+		switch (sStatus) {
+		case "POSTED":
+		case "APPROVED":
+			return sChangeStatus === 0 ? sap.ui.core.ValueState.Warning : sap.ui.core.ValueState.Success;
+		case "SENT":
+			return sap.ui.core.ValueState.Warning;
+		case "REJECTED":
+			return sap.ui.core.ValueState.Error;
+		default: //fallback (should not happen)
+			return sap.ui.core.ValueState.None;
+		}
+	}
+
 	return {
 		formatQuotaUsageExt: formatQuotaUsageExt,
-		formatQuotaAvailabilityExt: formatQuotaAvailabilityExt
+		formatQuotaAvailabilityExt: formatQuotaAvailabilityExt,
+		getListItemStatusExt: getListItemStatusExt
 	}
 });
