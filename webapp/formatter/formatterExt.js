@@ -68,12 +68,12 @@ sap.ui.define([
 	}
 
 	// Formatting method to set the right status of the list items          
-	function getListItemStatusExt(sStatus,sChangeStatus) {
+	function getListItemStatusExt(sStatus,sStatusText) {
 		debugger;
 		switch (sStatus) {
 		case "POSTED":
 		case "APPROVED":
-			return sChangeStatus === 0 ? sap.ui.core.ValueState.Warning : sap.ui.core.ValueState.Success;
+			return sStatusText.includes("отправлено") ? sap.ui.core.ValueState.Warning : sap.ui.core.ValueState.Success;
 		case "SENT":
 			return sap.ui.core.ValueState.Warning;
 		case "REJECTED":
