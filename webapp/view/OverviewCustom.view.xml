@@ -100,7 +100,7 @@
 										text="{parts:[ {path:'overview>StartDate', type: 'sap.ui.model.odata.type.DateTime', formatOptions: { style: 'medium' }, constraints: { displayFormat : 'Date' }}, {path:'overview>EndDate', type: 'sap.ui.model.odata.type.DateTime', formatOptions: { style: 'medium' }, constraints: { displayFormat : 'Date' }} ], formatter:'.formatter.formatOverviewLeaveDates'}"
 										class="sapMTableContentMargin"/>
 									<!-- Status -->
-									<ObjectStatus id="statusCell" text="{overview>StatusTxt}" state="{parts:['overview>StatusID', 'overview>StatusTxt'], formatter:'.formatterExt.getListItemStatusExt'}"
+									<ObjectStatus id="statusCell" text="{overview>StatusTxt}" state="{parts:['overview>StatusID', 'overview>ZzStatus'], formatter:'.formatterExt.getListItemStatusExt'}"
 										class="sapMTableContentMargin"/>
 									<!-- Approver -->
 									<ObjectAttribute id="approverCell" text="{overview>ApproverEmployeeName}" class="sapMTableContentMargin sapUiMediumMarginBegin"/>
