@@ -136,7 +136,7 @@ sap.ui.define([
 
 
 		onInit: function () {
-			debugger;
+			//debugger;
 
 			// add custom i18n
 			var i18nModel = new sap.ui.model.resource.ResourceModel({
@@ -165,6 +165,41 @@ sap.ui.define([
 						return "Type06";
 				}
 			};
+
+			var oButtonPopover = this.getView().byId("createMessagesIndicator");
+			oButtonPopover.addEventDelegate(
+				{
+					onAfterRendering: function () {
+						debugger;
+
+						// проверяем ошибки в message manager
+
+						let { bHasMessages, bAdvance, bSimulationIsOK } = this._checkServiceMessages({});
+
+						// открываем поповер только  когда нет авансов и это не рез-ты успешного моделирования
+						if (bHasMessages && !bAdvance && !bSimulationIsOK) {
+							if (!this._oMessagePopover) {
+								this._oMessagePopover = new MessagePopover({
+									items: {
+										path: "message>/",
+										template: new MessagePopoverItem({
+											description: "{message>description}",
+											type: "{message>type}",
+											title: "{message>message}",
+											subtitle: "{message>additionalText}"
+										})
+									}
+								});
+								jQuery.sap.syncStyleClass(this.getOwnerComponent().getContentDensityClass(), this.getView(), this._oMessagePopover);
+								this.getView().addDependent(this._oMessagePopover);
+							}
+							this._oMessagePopover.openBy(oButtonPopover);
+						}
+
+					}
+				},
+				this
+			);
 
 		},
 
@@ -316,7 +351,7 @@ sap.ui.define([
 			HANDLE SUBMIT
 			*/
 			var fnError = function (oError) {
-				debugger;
+				//debugger;
 
 				let oMessageManager = this.oErrorHandler._oMessageManager;
 
@@ -360,8 +395,13 @@ sap.ui.define([
 				}
 
 				// обработка ошибок из одата сервиса
+				//debugger;
 				let oParam = {};
-				let { bSomeMessage, bNoMessages, bAdvance, bSimulationResult, oMessage } = this._checkServiceMessages(oParam);
+				let { bHasMessages, bAdvance, bSimulationIsOK, oMessage } = this._checkServiceMessages(oParam);
+
+				if (bHasMessages && (!bAdvance || !bSimulationIsOK)) {
+					return;
+				}
 
 				if (bAdvance) {
 					sap.m.MessageBox.confirm(
@@ -378,41 +418,8 @@ sap.ui.define([
 
 					return;
 				}
-				if (bNoMessages) { //  просто остаемся на экране заявки
-					return;
-				}
-				if (bSomeMessage) { //  открываем попап с сообщениями
-					var oButtonPopover = this.getView().byId("createMessagesIndicator");
-					oButtonPopover.attachEventOnce(
-						{
-							onAfterRendering: function () {
-								//debugger;
-								if (!this._oMessagePopover) {
-									this._oMessagePopover = new MessagePopover({
-										items: {
-											path: "message>/",
-											template: new MessagePopoverItem({
-												description: "{message>description}",
-												type: "{message>type}",
-												title: "{message>message}",
-												subtitle: "{message>additionalText}"
-											})
-										}
-									});
-									jQuery.sap.syncStyleClass(this.getOwnerComponent().getContentDensityClass(), this.getView(), this._oMessagePopover);
-									this.getView().addDependent(this._oMessagePopover);
-								}
-								this._oMessagePopover.openBy(oButtonPopover);
-
-							}
-						},
-						this
-					);
-
-					return;
-				}
 				// 
-				if (bSimulationResult) { // выводим пэп
+				if (bSimulationIsOK) { // выводим пэп
 					oMessageManager.removeAllMessages();
 					this.oErrorHandler._aErrors = [];
 
@@ -430,7 +437,7 @@ sap.ui.define([
 
 				}
 
-			};
+			}; //fnError
 
 			if (this.oODataModel.hasPendingChanges()) {
 
@@ -473,22 +480,25 @@ sap.ui.define([
 
 		_checkServiceMessages: function (oParam) {
 
-			let bSomeMessage, bNoMessages, bAdvance, bSimulationResult, oMessage;
+			let bHasMessages, bAdvance, bSimulationIsOK;
 			let oMessageManager = this.oErrorHandler._oMessageManager;
 			let aMessages = oMessageManager.getMessageModel().getData();
-			if (!aMessages.length) {
-				bNoMessages = true;
+
+			// есть сообщения
+			if (aMessages.length) {
+				bHasMessages = true;
 			}
-			bSomeMessage = aMessages.length > 1 ? true : false;
-			oMessage = aMessages.find(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/006') : undefined);
+
+			// авансы
+			let oMessage = aMessages.find(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/006') : undefined);
 			oMessage = oMessage ? oMessage : aMessages.find(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/005') : undefined);
-
 			bAdvance = oMessage ? true : false;
+
 			// search ZHR0043_MSG/008 - успешное моделирование без ошибок
-			bSimulationResult = aMessages.findIndex(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/008') : false) > -1 ? true : false;
+			bSimulationIsOK = aMessages.findIndex(msg => (msg && msg.description) ? msg.description.includes('ZHR0043_MSG/008') : false) > -1 ? true : false;
 
 
-			return { bSomeMessage, bNoMessages, bAdvance, bSimulationResult, oMessage };
+			return { bHasMessages, bAdvance, bSimulationIsOK, oMessage };
 		},
 
 
