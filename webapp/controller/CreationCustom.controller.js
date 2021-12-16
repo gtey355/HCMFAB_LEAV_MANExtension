@@ -399,7 +399,7 @@ sap.ui.define([
 				let oParam = {};
 				let { bHasMessages, bAdvance, bSimulationIsOK, oMessage } = this._checkServiceMessages(oParam);
 
-				if (bHasMessages && (!bAdvance || !bSimulationIsOK)) {
+				if (bHasMessages && !bAdvance && !bSimulationIsOK) {
 					return;
 				}
 
