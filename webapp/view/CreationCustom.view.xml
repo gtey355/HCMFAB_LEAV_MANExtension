@@ -53,7 +53,7 @@
 						<Label id="quotaAvailabilityLabel" required="false" text="{i18n>quotaAvailabilityLabel}" labelFor="quotaAvailabilityText"
 							visible="{device>/system/phone}"/>
 						<Text id="quotaAvailabilityText"
-							text="{ parts: [ 'create>/BalanceAvailableQuantityText', 'create>/isQuotaCalculated', 'create>/TimeUnitName'], formatter:'.formatterExt.formatQuotaAvailabilityExt' }"/>
+							text="{ parts: [ 'create>/BalanceAvailableQuantityText', 'create>/isQuotaCalculated', 'create>/TimeUnitName', 'create>/AbsenceTypeCode'], formatter:'.formatterExt.formatQuotaAvailabilityExt' }"/>
 						<!--Leave Type Description (DESKTOP / TABLET)-->
 						<Label id="absDescLabel" required="false" text="{i18n>leaveTypeDescription}" labelFor="absDescLabelText"
 							visible="{= ${device>/system/desktop} &amp;&amp; !!${create>/AbsenceDescription}}"/>

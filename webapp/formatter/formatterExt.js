@@ -49,11 +49,13 @@ sap.ui.define([
 		return sAvailableDays;
 	}
 
-	function formatQuotaAvailabilityExt(sAvailabilityAmount, bIsQuotaRelevant, sTimeUnit) {
+	function formatQuotaAvailabilityExt(sAvailabilityAmount, bIsQuotaRelevant, sTimeUnit, sAbsenceTypeCode) {
+		//debugger;
 		
 		if (bIsQuotaRelevant === false) {
-			return this.getResourceBundle().getText("noQuotaRelevance");
+			return sAbsenceTypeCode && sAbsenceTypeCode === "2006" ? "" : this.getResourceBundle().getText("noQuotaRelevance");
 		}
+		
 		var fParsedNumber = parseFloat(sAvailabilityAmount);
 		if (!isNaN(fParsedNumber)) {
 			

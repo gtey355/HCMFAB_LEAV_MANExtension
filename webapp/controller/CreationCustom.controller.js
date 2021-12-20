@@ -1020,7 +1020,8 @@ sap.ui.define([
 				"showTimePicker": i.IsRecordInClockTimesAllowed && i.IsAllowedDurationPartialDay,
 				"showInputHours": i.IsRecordInClockHoursAllowed && i.IsAllowedDurationPartialDay,
 				"AbsenceDescription": i.AbsenceDescription ? i.AbsenceDescription : null,
-				"AbsenceTypeName": i.AbsenceTypeName
+				"AbsenceTypeName": i.AbsenceTypeName,
+				"AbsenceTypeCode": i.AbsenceTypeCode
 			});
 			if (i.IsQuotaUsed) {
 				this._updateAvailableQuota();
