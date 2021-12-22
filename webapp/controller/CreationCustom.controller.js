@@ -404,8 +404,10 @@ sap.ui.define([
 				}
 
 				if (bAdvance) {
+					let sAdvanceMsg = this.getView().getModel("i18n").getResourceBundle().getText("advanceMsg");
+
 					sap.m.MessageBox.confirm(
-						oMessage.message, {
+						sAdvanceMsg, {
 						actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
 						styleClass: bCompact ? "sapUiSizeCompact" : "",
 						onClose: function (sAction) {
