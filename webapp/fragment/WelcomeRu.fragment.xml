@@ -1,0 +1,22 @@
+<c:FragmentDefinition xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core">
+    <Dialog id="chooseLmsItemDialog" title="{i18n>welcome1}" contentWidth="75%" contentHeight="auto" class="sapUiContentPadding">
+        <content>
+            <VBox class="sapUiTinyMargin">
+            
+                <FormattedText htmlText="{i18n>welcome2}"/>
+                <FormattedText htmlText="{i18n>welcome3}"/>
+                <FormattedText htmlText="{i18n>welcome4}"/>
+                <FormattedText htmlText="{i18n>welcome5}"/>
+            </VBox>
+
+        </content>
+        <buttons>
+            <Button text="{i18n>btn.Continue}" press="onContinue" />
+            <Button text="{i18n>btn.Cancel}" press="onCancel" />
+        </buttons>
+    </Dialog>
+
+
+</c:FragmentDefinition>

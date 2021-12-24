@@ -164,6 +164,9 @@
 			<common:OnBehalfOverflowToolbarButton id="toolBtnOnBehalf" assignmentId="{global>/sEmployeeNumber}" assignmentChange="onAssignmentSwitch"
 				applicationId="MYLEAVEREQUESTS" visible="false"/>
 		</semantic:customFooterContent>
+		<semantic:dependents>
+			<core:Fragment fragmentName="hcm.fab.myleaverequest.HCMFAB_LEAV_MANExtension.fragment.WelcomeRu" type="XML"/>
+		</semantic:dependents>
 		<core:InvisibleText id="entitlementTitleInvTxt" text="{i18n>entitlementTabTitle}"/>
 		<core:InvisibleText id="entitlementCountInvTxt" text="{path: 'overview>/entCount', formatter: '.formatter.itemCountFormatterAccessibility'}"/>
 		<core:InvisibleText id="overviewTitleInvTxt" text="{i18n>overviewTabTitle}"/>

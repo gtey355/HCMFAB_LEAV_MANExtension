@@ -95,7 +95,7 @@ sap.ui.define(["hcm/fab/myleaverequest/HCMFAB_LEAV_MANExtension/formatter/format
       },
 
       onLimitDateChanged: function (oEvent) {
-        debugger;
+        //debugger;
 
         var oDatePicker = oEvent.getSource();
         var iSelectedDate = oDatePicker.getDateValue();
@@ -135,48 +135,29 @@ sap.ui.define(["hcm/fab/myleaverequest/HCMFAB_LEAV_MANExtension/formatter/format
           }.bind(this)
         ).then(
           function (oData) {
+            //debugger;
             if (oData.checkFirstSign.ZzInfo === "X") {
-              var bCompact = !!this.getView().$().closest(".sapUiSizeCompact")
-                .length;
-              let i18nModel = this.getView().getModel("i18n");
-              var sMsgText = i18nModel
-                .getResourceBundle()
-                .getText("msgFirstXssSign");
-              var sDetailInfo = i18nModel
-                .getResourceBundle()
-                .getText("detailInfo");
-              let bRes;
-
-
-              new Promise(function (resolve, reject) {
-                sap.m.MessageBox.confirm(sMsgText, {
-                  actions: [
-                    sap.m.MessageBox.Action.OK,
-                    sap.m.MessageBox.Action.CANCEL,
-                  ],
-                  styleClass: bCompact ? "sapUiSizeCompact" : "",
-                  details: sDetailInfo,
-                  onClose: function (sAction) {
-                    if (sAction === "OK") {
-                      bRes = true;
-                    } else {
-                      bRes = false;
-                    }
-                    resolve(bRes);
-                  },
-                });
-              }).then(
-                function (bRes) {
-                  if (bRes) {
-                    this._setFirstXssSign(sEmployeeId);
-                  } else {
-                    this._goBack();
-                  }
-                }.bind(this)
-              );
+            //if (true) {
+             let oPage = this.getView().byId("page");
+             let oDialog = oPage.getDependents()[0];
+             oDialog.open();
             }
           }.bind(this)
         );
+      },
+
+      onContinue: function(oEvent){
+        //debugger;
+
+        this._setFirstXssSign(this._sEmployeeNumber);
+        var oDialog = oEvent.getSource().getParent();
+        oDialog.close();
+
+      },
+
+      onCancel: function(oEvent){
+        var oDialog = oEvent.getSource().getParent();
+        oDialog.close();
       },
 
       _setFirstXssSign: function (sEmployeeId) {
