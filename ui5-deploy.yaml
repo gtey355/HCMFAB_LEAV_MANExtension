@@ -1,10 +1,11 @@
-# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
-
 specVersion: '1.0'
 metadata:
-  name: 'ZHR0043_LVREQCR'
+  name: 'zhr0043_leavreq_cr'
 type: application
 ui5Theme: sap_fiori_3
+resources:
+    configuration:
+        propertiesFileSourceEncoding: UTF-8
 builder:
   ignoreCertError: true
   resources:
@@ -12,33 +13,27 @@ builder:
       - /test/**
       - /localService/**
   customTasks:
-    - name: deploy-to-abap
-      afterTask: generateCachebusterInfo
-      configuration:
-        ignoreCertError: true
-        connection:
-          client: "100"
-          useStrictSSL: false
-        target:
-          url: https://vhmgthrdci.hec.corp.tander.ru:44300
-          client: "100"
-          auth: basic
-          useStrictSSL: false
-        credentials:
-          username: env:UI5_USERNAME
-          password: env:UI5_PASSWORD
-        app:
-          name: ZHR0043_LVREQCR
-          description: "zhr0043_leavreq_cr"
-          package: ZHR0043
-          transport: HRDK901203
-    # - name: ui5-task-transpile
-    #   afterTask: replaceVersion
-    #   configuration:
-    #     debug: true
-    #     removeConsoleStatements: true
-    #     transpileAsync: true
-    #     excludePatterns:
-    #     - "lib/"
-    #     - "another/dir/in/webapp"
-    #     - "yet/another/dir"
+      - name: ui5-task-transpile
+        afterTask: replaceVersion
+        configuration:
+          debug: true
+          removeConsoleStatements: true
+          transpileAsync: true
+          excludePatterns:
+            - "debug/"
+      - name: ui5-task-nwabap-deployer
+        afterTask: generateVersionInfo
+        configuration: 
+          resources:
+            pattern: "**/*.*"
+          connection:
+            server: https://vhmgthrdci.hec.corp.tander.ru:44300
+          authentication:
+            user: viperebato00
+            password: 2w2w2w@W
+          ui5:
+            language: RU
+            package: ZHR0043
+            bspContainer: ZHR0043_LVREQCR
+            bspContainerText: ZHR0043_LVREQCR
+            transportNo:    
