@@ -170,7 +170,7 @@ sap.ui.define([
 			oButtonPopover.addEventDelegate(
 				{
 					onAfterRendering: function () {
-						debugger;
+						//debugger;
 
 						// проверяем ошибки в message manager
 
@@ -790,7 +790,7 @@ sap.ui.define([
 					method: "GET",
 					urlParameters: oParams,
 					success: function (oResult) {
-						debugger;
+						//debugger;
 						oResult.CalculateLeaveSpan = oResult.ZCalculateLeaveSpan; // save old naming
 						//  Create button hided
 						this.oCreateModel.setProperty("/bUnavailable", !!oResult.ZCalculateLeaveSpan.TimeUnitText.length);
