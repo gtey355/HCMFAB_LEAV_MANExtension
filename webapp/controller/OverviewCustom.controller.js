@@ -30,6 +30,43 @@ sap.ui.define(["hcm/fab/myleaverequest/HCMFAB_LEAV_MANExtension/formatter/format
         oOverviewModel.setProperty("/limCount", 0);
       },
 
+      onCreateLeave: function () {
+        debugger;
+        // check first sign is created
+        let sEmployeeId = this.getModel("global").getProperty("/sEmployeeNumber");
+
+        // this check is run from a button, set a flag bCheckSignFromBtn = true to the model
+        this.getModel("global").setProperty("/bCheckSignFromBtn", true);
+
+        this._checkFirstXssSign(sEmployeeId).then((res) => {
+          if (res) {
+            this.navToCreateView();
+          }
+        }).finally(() => {
+          //this.getModel("global").setProperty("/bCheckSignFromBtn", false);
+        });
+      },
+
+      navToCreateView: function () {
+        // The source is the list item that got pressed
+        var oCalendar = this.getView().byId("calendar"),
+          aSelectedDates = oCalendar.getSelectedDates(),
+          oRouter = this.getRouter();
+        if (aSelectedDates.length === 0) {
+          oRouter.navTo("creation");
+        } else {
+          var dateRange = aSelectedDates[0],
+            oStartDate = utils.dateToUTC(dateRange.getStartDate());
+          oCalendar.destroySelectedDates();
+          oRouter.navTo("creationWithParams", {
+            dateFrom: "" + oStartDate.getTime(),
+            dateTo: "" + oStartDate.getTime(),
+            absenceType: "default",
+            sEmployeeID: this.getModel("global").getProperty("/sEmployeeNumber")
+          });
+        }
+      },
+
       _readLimits: function (sEmployeeId) {
 
         let oLimitStartDate = this.getView()
@@ -89,7 +126,8 @@ sap.ui.define(["hcm/fab/myleaverequest/HCMFAB_LEAV_MANExtension/formatter/format
           // Read Leave Request with in sync with Default Start value
           this._readLeaveRequestWithDefaultStartDate(sEmployeeId);
 
-          // check if first xss sign availables
+          // check if first xss sign availables, return Promise
+
           this._checkFirstXssSign(sEmployeeId);
         }
       },
@@ -118,7 +156,8 @@ sap.ui.define(["hcm/fab/myleaverequest/HCMFAB_LEAV_MANExtension/formatter/format
       },
 
       _checkFirstXssSign: function (sEmployeeId) {
-        new Promise(
+        //debugger;
+        return new Promise(
           function (resolve, reject) {
             this.oODataModel.callFunction("/checkFirstSign", {
               urlParameters: {
@@ -137,25 +176,34 @@ sap.ui.define(["hcm/fab/myleaverequest/HCMFAB_LEAV_MANExtension/formatter/format
           function (oData) {
             //debugger;
             if (oData.checkFirstSign.ZzInfo === "X") {
-            //if (true) {
-             let oPage = this.getView().byId("page");
-             let oDialog = oPage.getDependents()[0];
-             oDialog.open();
+              //if (true) {
+              let oPage = this.getView().byId("page");
+              let oDialog = oPage.getDependents()[0];
+              oDialog.open();
+            }
+            else {
+              return Promise.resolve(true);
             }
           }.bind(this)
         );
       },
 
-      onContinue: function(oEvent){
+      onContinue: function (oEvent) {
         //debugger;
 
         this._setFirstXssSign(this._sEmployeeNumber);
         var oDialog = oEvent.getSource().getParent();
         oDialog.close();
 
+        // определяем что диалог был вызван из кнопки
+        let bFromBtn = this.getModel("global").getProperty("/bCheckSignFromBtn");
+        if (bFromBtn) {
+          this.navToCreateView();
+        }
+
       },
 
-      onCancel: function(oEvent){
+      onCancel: function (oEvent) {
         var oDialog = oEvent.getSource().getParent();
         oDialog.close();
       },
