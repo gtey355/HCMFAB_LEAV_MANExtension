@@ -8,3 +8,4 @@ deploy.sh
 .vscode/launch.json
 .vscode/settings.json
 .*project.json
+package-lock*.*
